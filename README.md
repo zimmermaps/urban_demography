@@ -1,11 +1,11 @@
 # Global Urban Demographic Change and Migration Patterns
+![Urban Density Map](03_documents/03_other_figures/fig4_slice.png)
 ---
 ## Overview
 This repository contains all code, processed data, and figures to reproduce analyses from the manuscript on global urban demographic change and migration patterns.  
 
 It includes interactive visualizations, static figures, and detailed demographic outputs.
 
-![Urban Density Map](03_documents/03_other_figures/fig4_slice.png)
 
 ### Population Dependency Ratio by Country
 
