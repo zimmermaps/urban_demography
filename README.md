@@ -65,7 +65,7 @@ clone this repo and run locally:
 
 ```bash
 # Clone repository
-git clone <repo-url>
+git clone https://github.com/zimmermaps/urban_demography.git
 cd urban_demography
 
 # Set up virtual environment
