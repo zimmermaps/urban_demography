@@ -17,7 +17,7 @@ It includes interactive visualizations, static figures, and detailed demographic
     </td>
     <td align="center">
       <img src="03_documents/03_other_figures/Ghana_population_dependency_ratio.gif" width="400"><br>
-      <b>Other Country</b>
+      <b>Ghana</b>
     </td>
   </tr>
 </table>
