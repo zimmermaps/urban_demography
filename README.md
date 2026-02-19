@@ -30,7 +30,7 @@ This repository contains all code, processed data, and figures to reproduce anal
   </tr>
 </table>  
 
-View this <a href="https://zimmermaps.github.io/urban_demography/interactive_population_animation.html" target="_blank" rel="noopener noreferrer">interactive plot</a> to explore dynamic dependency ratio vs. population plots for all countries!
+View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore dynamic dependency ratio vs. population plots for all countries!
 
 ---
 
