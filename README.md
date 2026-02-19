@@ -30,7 +30,7 @@ This repository contains all code, processed data, and figures to reproduce anal
   </tr>
 </table>  
 
-View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore dynamic dependency ratio vs. population plots.
+View this <a href="https://zimmermaps.github.io/urban_demography/interactive_population_animation.html" target="_blank" rel="noopener noreferrer">interactive plot</a> to explore dynamic dependency ratio vs. population plots for all countries!
 
 ---
 
@@ -38,25 +38,25 @@ View this [interactive population animation](https://zimmermaps.github.io/urban_
 
 ```bash
 urban_demography/
-├── 01_data/                                # raw and processed datasets
-│   ├── 01_urban_agesex_output/             # raw output from zonal stats of WP data with GHS-UCDB
-│   ├── 02_auxiliary_data/                  # contains death rate information
-│   ├── 03_ghs_ucdb/                        # GHS-UCDB (R2024A)
-│   ├── 04_final_demographic_data/          # final demographic outputs used for analysis
-├── 02_code/                                # Jupyter notebooks for analysis
-│   ├── 01_initial_zonal_extract.ipynb      # initial zonal stats extract
-│   ├── 02_dataset_merge.ipynb              # merging datasets across years
-│   ├── 03_demographic_processing.ipynb     # calculate key demographic metrics
-│   ├── 04_demographic_change.ipynb         # calculate change over time
-│   ├── 05_gudd_figures.ipynb               # main manuscript figures
-│   ├── 06_supplement_figures.ipynb         # supplemental figures
-│   ├── 07_fun_figures.ipynb                # other visualizations
-├── 03_documents/                           # figures, tables, and supporting documents
-│   ├── 01_main_figures/                    # main figures (pdf)
-│   ├── 02_supplement_figures/              # supplement figures (pdf/png)
-│   ├── 03_other_figures/                   # other visualizations
-├── README.md                               # this file
-└── requirements.txt                        # python dependencies for reproducibility
+├── 01_data/                                  # raw and processed datasets
+│   ├── 04_final_demographic_data/            # final demographic outputs used for analysis
+├── 02_code/                                  # Jupyter notebooks for analysis
+│   ├── 01_initial_zonal_extract.ipynb        # initial zonal stats extract
+│   ├── 02_dataset_merge.ipynb                # merging datasets across years
+│   ├── 03_demographic_processing.ipynb       # calculate key demographic metrics
+│   ├── 04_demographic_change.ipynb           # calculate change over time
+│   ├── 05_gudd_figures.ipynb                 # main manuscript figures
+│   ├── 06_supplement_figures.ipynb           # supplemental figures
+│   ├── 07_fun_figures.ipynb                  # other visualizations
+├── 03_documents/                             # figures, tables, and supporting documents
+│   ├── 01_main_figures/                      # main figures (pdf)
+│   ├── 02_supplement_figures/                # supplement figures (pdf/png)
+│   ├── 03_other_figures/                     # other visualizations
+├── README.md                                 # this file
+├── docs                                      # this file
+│   ├── interactive_population_animation.html # html file that drives interactive viz
+├── .gitignore                                # defines files from local directory to ignore when pushing to git
+└── requirements.txt                          # python dependencies for reproducibility
 ```
 ---
 

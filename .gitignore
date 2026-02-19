@@ -57,8 +57,8 @@ dist/                 # Distribution packages
 01_data/02_auxiliary_data/
 01_data/03_ghs_ucdb/
 
+# make sure to include the zip folders
 01_data/04_final_demographic_data/**/*.csv
 01_data/*.zip
 01_data/04_final_demographic_data.zip
 
-.DS_Store
