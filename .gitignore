@@ -19,6 +19,7 @@ __pycache__/          # Python compiled cache
 # ==========================
 .DS_Store             # macOS Finder metadata
 Thumbs.db             # Windows Explorer thumbnail cache
+.vscode/
 
 # ==========================
 # Temporary or log files

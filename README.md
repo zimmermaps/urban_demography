@@ -4,8 +4,6 @@
 This repository contains all code, processed data, and figures to reproduce analyses from the manuscript on global urban demographic change and migration patterns.  
 It includes interactive visualizations, static figures, and detailed demographic outputs.
 
-[Interactive Population Animation](02_code/interactive_population_animation.html) – explore population dynamics over time (opens in browser)
-
 ![Urban Density Map](03_documents/03_other_figures/fig4_slice.png)
 
 ---
