@@ -65,7 +65,7 @@ It is organized into two subfolders:
 - `01_static_boundaries/`  
 - `02_dynamic_boundaries/`  
 
-Each folder contains three key files:
+Each folder contains three key files. They are zipped, so you will need to unzip them first.
 
 - `gudd_all` – raw data by age-gender group for every city  
 - `gudd_annual_metrics` – annual demographic metrics  
