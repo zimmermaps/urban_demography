@@ -1,0 +1,63 @@
+# ==========================
+# Python virtual environments
+# ==========================
+.venv/          # Python virtual environment (common name)
+env/            # Alternative virtual environment folder
+venv/           # Alternative virtual environment folder
+
+# ==========================
+# Jupyter and Python cache
+# ==========================
+.ipynb_checkpoints/   # Jupyter notebook checkpoints
+__pycache__/          # Python compiled cache
+*.pyc                 # Compiled Python files
+*.pyo                 # Optimized Python files
+*.pyd                 # Windows Python dynamic libraries
+
+# ==========================
+# System files
+# ==========================
+.DS_Store             # macOS Finder metadata
+Thumbs.db             # Windows Explorer thumbnail cache
+
+# ==========================
+# Temporary or log files
+# ==========================
+*.log                 # Log files
+*.tmp                 # Temporary files
+*.bak                 # Backup files
+
+# ==========================
+# Python packaging artifacts
+# ==========================
+*.egg-info/           # Package metadata
+build/                # Build directory for Python packages
+dist/                 # Distribution packages
+
+# ==========================
+# Editor and IDE folders
+# ==========================
+.vscode/              # VS Code workspace settings
+
+# ==========================
+# Project-specific folders to ignore
+# ==========================
+# Data that is archived and not needed for reproducibility
+01_data/archived_data/
+
+# Old code or archived scripts
+02_code/archived_code/
+
+# Archived figures or old documents
+03_documents/archived_figures/
+
+# Raw/large data
+01_data/01_urban_agesex_output/
+01_data/02_auxiliary_data/
+01_data/03_ghs_ucdb/
+
+01_data/04_final_demographic_data/**/*.csv
+01_data/*.zip
+01_data/04_final_demographic_data.zip
+
+.DS_Store
