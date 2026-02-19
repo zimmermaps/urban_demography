@@ -30,7 +30,7 @@ This repository contains all code, processed data, and figures to reproduce anal
   </tr>
 </table>  
 
-View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore dynamic dependency ratio vs. population plots for all countries!
+View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore plots for all countries!
 
 ---
 
@@ -65,6 +65,7 @@ clone this repo and run locally:
 
 ```bash
 # Clone repository
+cd /folder/you_want/this_repo/to_be
 git clone https://github.com/zimmermaps/urban_demography.git
 cd urban_demography
 
