@@ -1,39 +1,37 @@
 # Global Urban Demographic Change and Migration Patterns
-<img src="03_documents/03_other_figures/fig4_slice.png" alt="Urban Density Map" width="760">  
+<img src="03_documents/03_other_figures/fig4_slice.png" alt="Urban Density Map" width="800">  
 
 ---
 ## Overview
 This repository contains all code, processed data, and figures to reproduce analyses from the manuscript on global urban demographic change and migration patterns.  
 
-It includes interactive visualizations, static figures, and detailed demographic outputs.
-
-
-### Population Dependency Ratio by Country
+### Change in Urban Dependency Ratio Between 2000-2020
 
 <table>
   <tr>
     <td align="center">
-      <img src="03_documents/03_other_figures/Japan_population_dependency_ratio.gif" width="380" alt="Japan Dependency Ratio"><br>
+      <img src="03_documents/03_other_figures/Japan_population_dependency_ratio.gif" width="400" alt="Japan Dependency Ratio"><br>
       <b>Japan</b>
     </td>
     <td align="center">
-      <img src="03_documents/03_other_figures/Ghana_population_dependency_ratio.gif" width="380" alt="GhanaDependency Ratio"><br>
+      <img src="03_documents/03_other_figures/Ghana_population_dependency_ratio.gif" width="400" alt="GhanaDependency Ratio"><br>
       <b>Ghana</b>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="03_documents/03_other_figures/United States_population_dependency_ratio.gif" width="380" alt="United States Dependency Ratio"><br>
+      <img src="03_documents/03_other_figures/United States_population_dependency_ratio.gif" width="400" alt="United States Dependency Ratio"><br>
       <b>United States</b>
     </td>
     <td align="center">
-      <img src="03_documents/03_other_figures/Ukraine_population_dependency_ratio.gif" width="380" alt="Ukraine Dependency Ratio"><br>
+      <img src="03_documents/03_other_figures/Ukraine_population_dependency_ratio.gif" width="400" alt="Ukraine Dependency Ratio"><br>
       <b>Ukraine</b>
     </td>
   </tr>
-</table>
+</table>  
 
-View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to see more of these dynamic dependency ratio v population plots.
+View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore dynamic dependency ratio vs. population plots.
+
 ---
 
 ## Project Structure
@@ -62,7 +60,7 @@ urban_demography/
 ```
 ---
 
-# Installation Instructions
+## Installation Instructions
 clone this repo and run locally:
 
 ```bash
