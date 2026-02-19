@@ -12,12 +12,22 @@ It includes interactive visualizations, static figures, and detailed demographic
 <table>
   <tr>
     <td align="center">
-      <img src="03_documents/03_other_figures/Japan_population_dependency_ratio.gif" width="400"><br>
+      <img src="03_documents/03_other_figures/Japan_population_dependency_ratio.gif" width="250" alt="Japan Dependency Ratio"><br>
       <b>Japan</b>
     </td>
     <td align="center">
-      <img src="03_documents/03_other_figures/Ghana_population_dependency_ratio.gif" width="400"><br>
+      <img src="03_documents/03_other_figures/Ghana_population_dependency_ratio.gif" width="250" alt="GhanaDependency Ratio"><br>
       <b>Ghana</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="03_documents/03_other_figures/United States_population_dependency_ratio.gif" width="250" alt="United States Dependency Ratio"><br>
+      <b>United States</b>
+    </td>
+    <td align="center">
+      <img src="03_documents/03_other_figures/Ukraine_population_dependency_ratio.gif" width="250" alt="Ukraine Dependency Ratio"><br>
+      <b>Ukraine</b>
     </td>
   </tr>
 </table>
