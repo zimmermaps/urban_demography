@@ -1,5 +1,5 @@
 # Global Urban Demographic Change and Migration Patterns
-![Urban Density Map](03_documents/03_other_figures/fig4_slice.png)
+<img src="03_documents/03_other_figures/fig4_slice.png" alt="Urban Density Map" width="760">
 ---
 ## Overview
 This repository contains all code, processed data, and figures to reproduce analyses from the manuscript on global urban demographic change and migration patterns.  
