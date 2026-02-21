@@ -65,3 +65,5 @@ dist/                 # Distribution packages
 01_data/*.zip
 01_data/04_final_demographic_data.zip
 
+# ignore submission documents for now
+04_submission_documents/
