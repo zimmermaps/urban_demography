@@ -4,7 +4,7 @@
 ---
 ## Overview
 
-This repository accompanies the manuscript and provides globally consistent, city-level estimates of urban demographic structure, natural change, and migration for > 10,000 cities from 2000–2020 using both static and dynamically evolving urban boundaries.
+This repository accompanies the manuscript and provides access to the code and data for globally consistent, city-level estimates of urban demographic structure, natural change, and migration for > 10,000 cities from 2000–2020 using both static and dynamically evolving urban boundaries.
 
 ### Change in Urban Dependency Ratio Between 2000-2020
 
