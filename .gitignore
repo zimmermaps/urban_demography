@@ -8,7 +8,8 @@ venv/           # Alternative virtual environment folder
 # ==========================
 # Jupyter and Python cache
 # ==========================
-.ipynb_checkpoints/   # Jupyter notebook checkpoints
+.ipynb_checkpoints/     # Jupyter notebook checkpoints
+**/.ipynb_checkpoints/  # Jupyter notebook checkpoints
 __pycache__/          # Python compiled cache
 *.pyc                 # Compiled Python files
 *.pyo                 # Optimized Python files

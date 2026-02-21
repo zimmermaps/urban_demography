@@ -91,8 +91,8 @@ Users should select the boundary definition appropriate for their research quest
 
 `{boundary_type}` is either:
 
-- `static`
-- `dynamic`
+- `static_boundaries`
+- `dynamic_boundaries`
 
 | File | Level | Contents |
 |---|---|---|
@@ -109,7 +109,7 @@ These columns identify each city and provide geographic context.
 | Column | Description |
 |---|---|
 | `ID_UC_G0` | Unique city identifier (consistent across all years and files) |
-| `year` | Calendar year (2000–2020). In `gudd_change`, represents the endpoint year (2020) |
+| `year` | Calendar year (2000–2020). In `gudd_change_2000_2020_{boundary_type}`, represents the endpoint year (2020) |
 | `Name` | City name |
 | `Country` | Country name |
 | `Continent` | Continent |
