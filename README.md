@@ -3,7 +3,8 @@
 
 ---
 ## Overview
-This repository contains all code, processed data, and figures to reproduce analyses from the manuscript on global urban demographic change and migration patterns.  
+
+This repository accompanies the manuscript and provides a globally consistent, city-level estimates of urban demographic structure, natural change, and migration for > 10,000 cities from 2000–2020 using both static and dynamically evolving urban boundaries.
 
 ### Change in Urban Dependency Ratio Between 2000-2020
 
@@ -33,7 +34,24 @@ This repository contains all code, processed data, and figures to reproduce anal
 View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore plots for all countries!
 
 ---
+## Global Urban Demographic Dataset (GUDD)
 
+The final analysis output is located at:
+
+`01_data/04_final_demographic_data/`
+
+It is organized into two subfolders:
+
+- `01_static_boundaries/`  
+- `02_dynamic_boundaries/`  
+
+Each folder contains three key files. They are zipped, so you will need to unzip them first.
+
+- `gudd_all` – raw population counts for each age-sex cohort, for every year from 2000-2020 and every city.
+- `gudd_annual_metrics` – demographic metrics (dependency ratio, sex ratio, child-woman ratio, natural change, migration etc.) for every year and every city.
+- `gudd_change` – change in demographic metrics between 2000 and 2020.
+
+---
 ## Project Structure
 
 ```bash
@@ -85,19 +103,3 @@ pip freeze > requirements.txt
 ```
 ---
 
-## Global Urban Demographic Dataset (GUDD)
-
-The final analysis output is located at:
-
-`01_data/04_final_demographic_data/`
-
-It is organized into two subfolders:
-
-- `01_static_boundaries/`  
-- `02_dynamic_boundaries/`  
-
-Each folder contains three key files. They are zipped, so you will need to unzip them first.
-
-- `gudd_all` – raw population counts for each age-sex cohort, for every year from 2000-2020 and every city.
-- `gudd_annual_metrics` – demographic metrics (dependency ratio, sex ratio, child-woman ratio, natural change, migration etc.) for every year and every city.
-- `gudd_change` – change in demographic metrics between 2000 and 2020.
