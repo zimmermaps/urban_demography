@@ -256,6 +256,9 @@ Example:
 
 Some brief instructions to clone this repo, create a virtual environment, install dependencies, and run the notebooks.
 
+Typical install time: 5-10 minutes
+Typical demo time: 5-10 minutes
+
 ```bash
 # requires Python 3.11 or newer
 python --version
