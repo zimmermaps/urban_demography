@@ -1,45 +1,44 @@
 # ==========================
 # Python virtual environments
 # ==========================
-.venv/          # Python virtual environment (common name)
-env/            # Alternative virtual environment folder
-venv/           # Alternative virtual environment folder
-
+.venv/
+env/
+venv/
 # ==========================
 # Jupyter and Python cache
 # ==========================
-.ipynb_checkpoints/     # Jupyter notebook checkpoints
-**/.ipynb_checkpoints/  # Jupyter notebook checkpoints
-__pycache__/          # Python compiled cache
-*.pyc                 # Compiled Python files
-*.pyo                 # Optimized Python files
-*.pyd                 # Windows Python dynamic libraries
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # ==========================
 # System files
 # ==========================
 .DS_Store
-Thumbs.db             # Windows Explorer thumbnail cache
+Thumbs.db
 .vscode/
 
 # ==========================
 # Temporary or log files
 # ==========================
-*.log                 # Log files
-*.tmp                 # Temporary files
-*.bak                 # Backup files
+*.log
+*.tmp
+*.bak
 
 # ==========================
 # Python packaging artifacts
 # ==========================
-*.egg-info/           # Package metadata
-build/                # Build directory for Python packages
-dist/                 # Distribution packages
+*.egg-info/
+build/
+dist/
 
 # ==========================
 # Editor and IDE folders
 # ==========================
-.vscode/              # VS Code workspace settings
+.vscode/
 
 # ==========================
 # Project-specific folders to ignore

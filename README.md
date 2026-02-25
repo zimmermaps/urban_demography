@@ -257,7 +257,7 @@ Example:
 Some brief instructions to clone this repo, create a virtual environment, install dependencies, and run the notebooks.
 
 ```bash
-# requires Python 3.10 or newer
+# requires Python 3.11 or newer
 python --version
 
 # clone repository
