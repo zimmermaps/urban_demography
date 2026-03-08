@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GUDD Explorer | Maps</title>
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E"
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.4.0/dist/maplibre-gl.css" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="theme-dark">
+  <main id="app">
+    <section id="sidebar" class="sidebar">
+      <button id="closeSidebar" class="close-button" type="button" aria-label="Close panel">Close</button>
+      <header class="sidebar-header">
+        <h1 id="cityTitle">Select a City</h1>
+        <div id="cityMetaRows" class="city-meta">
+          <p><span>Country:</span> —</p>
+          <p><span>Region:</span> —</p>
+          <p><span>Income status:</span> —</p>
+        </div>
+      </header>
+
+      <section class="controls">
+        <label for="yearSlider" class="control-label">Year</label>
+        <div class="control-row">
+          <input id="yearSlider" type="range" min="0" max="20" step="1" value="20" disabled>
+          <span id="yearValue" class="year-value">2020</span>
+          <button id="playPauseButton" type="button" class="play-button" disabled>Play</button>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-title-row">
+          <h2 class="section-title">Population Pyramid</h2>
+          <button
+            id="downloadGifButton"
+            type="button"
+            class="play-button icon-button"
+            title="Download population pyramid GIF"
+            aria-label="Download population pyramid GIF"
+            disabled
+          >GIF↓</button>
+        </div>
+        <div id="pyramidPlot" class="plot"></div>
+      </section>
+
+      <section>
+        <div class="section-title-row">
+          <h2 class="section-title">Population and Dependency</h2>
+          <button
+            id="downloadTrendPngButton"
+            type="button"
+            class="play-button icon-button"
+            title="Download population and dependency PNG"
+            aria-label="Download population and dependency PNG"
+            disabled
+          >PNG↓</button>
+        </div>
+        <div id="trendPlot" class="plot"></div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Snapshot Metrics</h2>
+        <div id="metricCards" class="metric-cards"></div>
+      </section>
+
+      <section class="data-source">
+        Data from Zimmer et al., <em>Global Urban Demographic Change and Migration Patterns</em>.
+        <a href="https://github.com/zimmermaps/urban_demography" target="_blank" rel="noreferrer noopener">Repository</a>
+      </section>
+    </section>
+
+    <section class="map-shell">
+      <div class="top-ribbon">
+        <div class="title-block">
+          <h2>Global Urban Demographic Dataset (GUDD) Explorer</h2>
+          <p class="title-subtext">Explore and click a city for a demographic breakdown.</p>
+          <p class="title-meta">
+            <a
+              class="repo-link"
+              href="https://github.com/zimmermaps/urban_demography"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52 0-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+              </svg>
+              <span>GitHub Repository</span>
+            </a>
+            <a
+              class="meta-link"
+              href="../../../docs/interactive_population_animation.html"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 20h16v-2H4v2Zm2-4h2V9H6v7Zm5 0h2V4h-2v12Zm5 0h2v-9h-2v9Z"></path>
+              </svg>
+              <span>More Dynamic Plots</span>
+            </a>
+            <span>Zimmer et al., <em>Global Urban Demographic Change and Migration Patterns</em></span>
+          </p>
+        </div>
+        <div class="top-right-controls">
+          <button id="basemapToggle" class="map-toggle" type="button" title="Switch dark/light basemap">🌓</button>
+          <p id="statusText" class="status">Loading map layers...</p>
+        </div>
+      </div>
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.4.0/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GUDD Explorer</title>
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E"
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:
+        radial-gradient(circle at 16% 8%, rgba(53, 128, 193, 0.26) 0%, rgba(53, 128, 193, 0) 50%),
+        radial-gradient(circle at 84% 14%, rgba(124, 97, 232, 0.24) 0%, rgba(124, 97, 232, 0) 48%),
+        linear-gradient(168deg, #0a1622 0%, #0e1d2d 100%);
+      --ink: #d8e9fb;
+      --muted: #9fc0df;
+      --card-bg: linear-gradient(180deg, rgba(12, 25, 38, 0.98), rgba(9, 19, 30, 0.98));
+      --card-border: rgba(149, 184, 219, 0.32);
+      --card-shadow: 0 16px 34px rgba(2, 7, 12, 0.46);
+      --link-bg: #294b6c;
+      --link-fg: #e5f3ff;
+      --link-border: #7fb6ec;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "IBM Plex Mono", monospace;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero,
+    .cards {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      box-shadow: var(--card-shadow);
+    }
+
+    .hero {
+      padding: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .cards {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+    }
+
+    .card {
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px;
+      background: rgba(18, 36, 54, 0.55);
+      display: grid;
+      gap: 8px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.35;
+    }
+
+    .card a {
+      justify-self: start;
+      text-decoration: none;
+      border: 1px solid var(--link-border);
+      border-radius: 9px;
+      padding: 5px 10px;
+      color: var(--link-fg);
+      background: var(--link-bg);
+      font-size: 0.74rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>Global Urban Demographic Dataset (GUDD) Explorer</h1>
+      <p class="subtitle">Choose a viewer. Both are organized under one GitHub Pages folder.</p>
+    </section>
+    <section class="cards">
+      <article class="card">
+        <h2>GUDD Explorer | Maps</h2>
+        <p>Interactive boundary map with click-through city demographic panels and exports.</p>
+        <a href="./maps/index.html">Open Maps</a>
+      </article>
+      <article class="card">
+        <h2>GUDD Explorer | Plots</h2>
+        <p>Animated population versus dependency plot viewer with GIF and PNG downloads.</p>
+        <a href="./plots/index.html">Open Plots</a>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
