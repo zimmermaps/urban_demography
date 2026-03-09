@@ -101,13 +101,18 @@
       line-height: 1.35;
     }
 
-    .preview-image {
+    .preview-frame {
       width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
       border: 1px solid var(--card-border);
       border-radius: 8px;
       background: rgba(12, 25, 38, 0.8);
+      overflow: hidden;
+    }
+
+    .preview-frame svg {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     .card a {
@@ -132,23 +137,68 @@
       <article class="card">
         <h2>GUDD Explorer | Maps</h2>
         <p>Interactive boundary map with click-through city demographic panels and exports.</p>
-        <img
-          class="preview-image"
-          src="./assets/maps-preview.svg"
-          alt="Static preview of the map viewer"
-          loading="lazy"
-        >
+        <div class="preview-frame">
+          <svg viewBox="0 0 320 180" role="img" aria-label="Map viewer preview">
+            <defs>
+              <linearGradient id="mapBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0f2334"/>
+                <stop offset="100%" stop-color="#1b3b56"/>
+              </linearGradient>
+            </defs>
+            <rect width="320" height="180" fill="url(#mapBg)"/>
+            <rect x="0" y="0" width="112" height="180" fill="#12283c" opacity="0.96"/>
+            <rect x="10" y="11" width="54" height="14" rx="4" fill="#295174"/>
+            <rect x="10" y="31" width="92" height="18" rx="5" fill="#1f405d"/>
+            <rect x="10" y="55" width="92" height="30" rx="5" fill="#1a3650"/>
+            <rect x="10" y="91" width="92" height="38" rx="5" fill="#193249"/>
+            <rect x="10" y="134" width="44" height="30" rx="5" fill="#22445f"/>
+            <rect x="58" y="134" width="44" height="30" rx="5" fill="#22445f"/>
+            <rect x="122" y="9" width="127" height="24" rx="6" fill="#1d6172"/>
+            <rect x="256" y="9" width="56" height="24" rx="6" fill="#214766"/>
+            <path d="M122 44 L165 38 L197 52 L231 42 L271 58 L311 48 L311 174 L122 174 Z" fill="#26587a"/>
+            <path d="M130 66 L163 60 L196 74 L229 65 L266 82 L303 72 L303 166 L130 166 Z" fill="#2f6a91"/>
+            <path d="M137 87 L169 82 L197 93 L230 87 L260 101 L295 95 L295 159 L137 159 Z" fill="#3b7faa"/>
+            <circle cx="220" cy="102" r="6" fill="#ffd98a"/>
+            <circle cx="220" cy="102" r="3" fill="#ffb65a"/>
+          </svg>
+        </div>
         <a href="./maps/index.html">Open Maps</a>
       </article>
       <article class="card">
         <h2>GUDD Explorer | Plots</h2>
         <p>Animated population versus dependency plot viewer with GIF and PNG downloads.</p>
-        <img
-          class="preview-image"
-          src="./assets/plots-preview.svg"
-          alt="Static preview of the plots viewer"
-          loading="lazy"
-        >
+        <div class="preview-frame">
+          <svg viewBox="0 0 320 180" role="img" aria-label="Plots viewer preview">
+            <defs>
+              <linearGradient id="plotBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0f2233"/>
+                <stop offset="100%" stop-color="#1a3a53"/>
+              </linearGradient>
+            </defs>
+            <rect width="320" height="180" fill="url(#plotBg)"/>
+            <rect x="9" y="10" width="302" height="30" rx="6" fill="#163147"/>
+            <rect x="15" y="17" width="84" height="16" rx="4" fill="#264c6e"/>
+            <rect x="103" y="17" width="72" height="16" rx="4" fill="#264c6e"/>
+            <rect x="179" y="17" width="58" height="16" rx="4" fill="#264c6e"/>
+            <rect x="241" y="17" width="30" height="16" rx="4" fill="#2f5b7f"/>
+            <rect x="275" y="17" width="30" height="16" rx="4" fill="#2f5b7f"/>
+            <rect x="9" y="46" width="302" height="124" rx="6" fill="#12283d"/>
+            <rect x="21" y="57" width="286" height="102" rx="6" fill="#15324a"/>
+            <line x1="38" y1="145" x2="294" y2="145" stroke="#9ec8e5" stroke-width="1.4"/>
+            <line x1="38" y1="145" x2="38" y2="70" stroke="#9ec8e5" stroke-width="1.4"/>
+            <line x1="85" y1="145" x2="85" y2="70" stroke="#5d86aa" stroke-opacity="0.38"/>
+            <line x1="132" y1="145" x2="132" y2="70" stroke="#5d86aa" stroke-opacity="0.38"/>
+            <line x1="179" y1="145" x2="179" y2="70" stroke="#5d86aa" stroke-opacity="0.38"/>
+            <line x1="226" y1="145" x2="226" y2="70" stroke="#5d86aa" stroke-opacity="0.38"/>
+            <line x1="273" y1="145" x2="273" y2="70" stroke="#5d86aa" stroke-opacity="0.38"/>
+            <polyline points="45,137 74,131 103,124 132,116 161,109 190,100 219,95 248,87 278,79" fill="none" stroke="#f6c96c" stroke-width="2.6"/>
+            <polyline points="45,142 74,138 103,132 132,125 161,119 190,112 219,106 248,99 278,92" fill="none" stroke="#7cdcff" stroke-width="2.6"/>
+            <circle cx="190" cy="100" r="2.7" fill="#ffe6b3"/>
+            <circle cx="248" cy="87" r="2.7" fill="#ffe6b3"/>
+            <circle cx="219" cy="106" r="2.7" fill="#a6ebff"/>
+            <circle cx="278" cy="92" r="2.7" fill="#a6ebff"/>
+          </svg>
+        </div>
         <a href="./plots/index.html">Open Plots</a>
       </article>
     </section>
