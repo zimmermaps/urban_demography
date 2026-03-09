@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Maps viewer preview</title>
+  <desc id="desc">Static mock preview of the GUDD map viewer interface.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1926"/>
+      <stop offset="100%" stop-color="#122b40"/>
+    </linearGradient>
+    <linearGradient id="mapShell" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#163950"/>
+      <stop offset="100%" stop-color="#10283b"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#173147"/>
+      <stop offset="100%" stop-color="#101f30"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#156d73"/>
+      <stop offset="100%" stop-color="#1f375c"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="32" y="32" width="1136" height="611" rx="24" fill="#0d2132" stroke="#4c7699" stroke-opacity="0.45"/>
+
+  <rect x="56" y="56" width="410" height="563" rx="18" fill="url(#panel)" stroke="#5d88ab" stroke-opacity="0.45"/>
+  <rect x="80" y="86" width="130" height="34" rx="10" fill="#224662" stroke="#7aa9d1" stroke-opacity="0.7"/>
+  <rect x="80" y="138" width="250" height="36" rx="10" fill="#203d57"/>
+  <rect x="80" y="186" width="300" height="70" rx="10" fill="#1a334a" stroke="#6d95b8" stroke-opacity="0.35"/>
+  <rect x="80" y="278" width="350" height="84" rx="12" fill="#1c3851" stroke="#6d95b8" stroke-opacity="0.35"/>
+  <rect x="80" y="378" width="350" height="106" rx="12" fill="#173149" stroke="#6d95b8" stroke-opacity="0.35"/>
+  <rect x="80" y="500" width="168" height="96" rx="12" fill="#1f3d58" stroke="#6d95b8" stroke-opacity="0.35"/>
+  <rect x="262" y="500" width="168" height="96" rx="12" fill="#1f3d58" stroke="#6d95b8" stroke-opacity="0.35"/>
+
+  <rect x="490" y="56" width="654" height="563" rx="18" fill="url(#mapShell)" stroke="#5d88ab" stroke-opacity="0.45"/>
+  <rect x="514" y="80" width="360" height="102" rx="14" fill="url(#ribbon)" stroke="#9fdff2" stroke-opacity="0.55"/>
+  <rect x="890" y="86" width="116" height="36" rx="10" fill="#184466" stroke="#9fdff2" stroke-opacity="0.65"/>
+  <rect x="1018" y="86" width="102" height="36" rx="10" fill="#193f5d" stroke="#9fdff2" stroke-opacity="0.45"/>
+
+  <path d="M520 218 L688 188 L792 246 L904 208 L1022 258 L1122 220 L1122 596 L520 596 Z" fill="#1c3f59"/>
+  <path d="M534 246 L646 226 L732 276 L848 238 L950 286 L1088 250 L1088 568 L534 568 Z" fill="#245170"/>
+  <path d="M560 294 L660 274 L750 318 L856 284 L978 332 L1062 306 L1062 546 L560 546 Z" fill="#2b5f82"/>
+  <path d="M615 356 L690 338 L754 372 L840 348 L922 392 L994 374 L994 512 L615 512 Z" fill="#34719a"/>
+
+  <circle cx="812" cy="365" r="15" fill="#ffe3a3" stroke="#ffc261" stroke-width="3"/>
+  <circle cx="812" cy="365" r="8" fill="#ff9f4f"/>
+
+  <text x="532" y="111" fill="#e5f7ff" font-family="'IBM Plex Mono', monospace" font-size="24">Global Urban Demographic Dataset Explorer</text>
+  <text x="532" y="145" fill="#bfe4f2" font-family="'IBM Plex Mono', monospace" font-size="18">Static map viewer preview</text>
+</svg>

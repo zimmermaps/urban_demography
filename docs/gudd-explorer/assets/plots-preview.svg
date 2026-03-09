@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Plots viewer preview</title>
+  <desc id="desc">Static mock preview of the GUDD plots viewer interface.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1622"/>
+      <stop offset="100%" stop-color="#0f2437"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#17324a"/>
+      <stop offset="100%" stop-color="#12283c"/>
+    </linearGradient>
+    <linearGradient id="canvas" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f2335"/>
+      <stop offset="100%" stop-color="#152e45"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="32" y="32" width="1136" height="611" rx="24" fill="#0d2132" stroke="#4c7699" stroke-opacity="0.45"/>
+
+  <rect x="56" y="56" width="1088" height="138" rx="16" fill="url(#panel)" stroke="#5f8db2" stroke-opacity="0.45"/>
+  <rect x="78" y="84" width="300" height="34" rx="10" fill="#224662" stroke="#7ab4db" stroke-opacity="0.6"/>
+  <rect x="396" y="84" width="260" height="34" rx="10" fill="#224662" stroke="#7ab4db" stroke-opacity="0.6"/>
+  <rect x="674" y="84" width="194" height="34" rx="10" fill="#224662" stroke="#7ab4db" stroke-opacity="0.6"/>
+  <rect x="886" y="84" width="110" height="34" rx="10" fill="#284f71"/>
+  <rect x="1008" y="84" width="114" height="34" rx="10" fill="#295175"/>
+  <rect x="78" y="132" width="164" height="30" rx="999" fill="#1b3e5a" stroke="#6c9fc7" stroke-opacity="0.5"/>
+  <rect x="254" y="132" width="188" height="30" rx="999" fill="#1b3e5a" stroke="#6c9fc7" stroke-opacity="0.5"/>
+  <rect x="454" y="132" width="168" height="30" rx="999" fill="#1b3e5a" stroke="#6c9fc7" stroke-opacity="0.5"/>
+
+  <rect x="56" y="214" width="1088" height="405" rx="16" fill="url(#canvas)" stroke="#5f8db2" stroke-opacity="0.45"/>
+  <rect x="84" y="242" width="1032" height="349" rx="12" fill="#132c42" stroke="#6d9dc2" stroke-opacity="0.4"/>
+
+  <line x1="148" y1="540" x2="1068" y2="540" stroke="#9bc7e7" stroke-opacity="0.78" stroke-width="2"/>
+  <line x1="148" y1="540" x2="148" y2="282" stroke="#9bc7e7" stroke-opacity="0.78" stroke-width="2"/>
+  <line x1="320" y1="540" x2="320" y2="282" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="492" y1="540" x2="492" y2="282" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="664" y1="540" x2="664" y2="282" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="836" y1="540" x2="836" y2="282" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="1008" y1="540" x2="1008" y2="282" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="148" y1="476" x2="1068" y2="476" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="148" y1="412" x2="1068" y2="412" stroke="#5f88ac" stroke-opacity="0.34"/>
+  <line x1="148" y1="348" x2="1068" y2="348" stroke="#5f88ac" stroke-opacity="0.34"/>
+
+  <polyline points="180,498 270,468 380,450 470,420 560,392 650,366 740,348 830,330 940,304 1040,286" fill="none" stroke="#fdc763" stroke-width="4"/>
+  <polyline points="180,520 260,500 350,476 450,452 530,420 620,398 720,380 820,360 930,338 1040,320" fill="none" stroke="#78d9ff" stroke-width="4"/>
+  <g fill="#fce4ae" stroke="#ffc76c" stroke-width="2">
+    <circle cx="470" cy="420" r="7"/>
+    <circle cx="650" cy="366" r="7"/>
+    <circle cx="830" cy="330" r="7"/>
+    <circle cx="1040" cy="286" r="7"/>
+  </g>
+  <g fill="#99e7ff" stroke="#63c9e6" stroke-width="2">
+    <circle cx="450" cy="452" r="7"/>
+    <circle cx="620" cy="398" r="7"/>
+    <circle cx="820" cy="360" r="7"/>
+    <circle cx="1040" cy="320" r="7"/>
+  </g>
+
+  <text x="168" y="276" fill="#dff2ff" font-family="'IBM Plex Mono', monospace" font-size="22">Population vs Dependency</text>
+  <text x="168" y="308" fill="#b7d9f3" font-family="'IBM Plex Mono', monospace" font-size="16">Static plots viewer preview</text>
+</svg>

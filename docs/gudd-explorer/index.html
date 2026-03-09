@@ -101,6 +101,15 @@
       line-height: 1.35;
     }
 
+    .preview-image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: rgba(12, 25, 38, 0.8);
+    }
+
     .card a {
       justify-self: start;
       text-decoration: none;
@@ -117,17 +126,29 @@
   <main>
     <section class="hero">
       <h1>Global Urban Demographic Dataset (GUDD) Explorer</h1>
-      <p class="subtitle">Choose a viewer. Both are organized under one GitHub Pages folder.</p>
+      <p class="subtitle">Choose a viewer.</p>
     </section>
     <section class="cards">
       <article class="card">
         <h2>GUDD Explorer | Maps</h2>
         <p>Interactive boundary map with click-through city demographic panels and exports.</p>
+        <img
+          class="preview-image"
+          src="./assets/maps-preview.svg"
+          alt="Static preview of the map viewer"
+          loading="lazy"
+        >
         <a href="./maps/index.html">Open Maps</a>
       </article>
       <article class="card">
         <h2>GUDD Explorer | Plots</h2>
         <p>Animated population versus dependency plot viewer with GIF and PNG downloads.</p>
+        <img
+          class="preview-image"
+          src="./assets/plots-preview.svg"
+          alt="Static preview of the plots viewer"
+          loading="lazy"
+        >
         <a href="./plots/index.html">Open Plots</a>
       </article>
     </section>
