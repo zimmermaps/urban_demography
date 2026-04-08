@@ -4,6 +4,7 @@
 .venv/
 env/
 venv/
+.venv*
 # ==========================
 # Jupyter and Python cache
 # ==========================
