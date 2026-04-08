@@ -3,6 +3,31 @@ const PLAY_INTERVAL_MS = 520;
 const GIF_FRAME_INTERVAL_SECONDS = 0.42;
 const PLOT_FONT_FAMILY = "IBM Plex Mono, monospace";
 const PNG_EXPORT_SCALE = 3;
+const COUNTRY_PLOT_CANVAS_WIDTH = 980;
+const COUNTRY_PLOT_CANVAS_HEIGHT = 680;
+const COUNTRY_PLOT_LOG_MULTIPLIERS = [1, 2, 5];
+const COUNTRY_PLOT_BASE_FONT_SIZE = 11;
+const COUNTRY_PLOT_BASE_TITLE_FONT_SIZE = 13;
+const COUNTRY_PLOT_BASE_SUBTITLE_FONT_SIZE = 11;
+const EXPORT_WATERMARK_LINES = ["Zimmer et al., (2026)", "Nature Cities"];
+const SIDEBAR_DEFAULT_WIDTH = 500;
+const SIDEBAR_DEFAULT_WIDTH_RATIO = 0.32;
+const SIDEBAR_MIN_WIDTH = 360;
+const SIDEBAR_MAX_WIDTH = 860;
+const COUNTRY_PLOT_PALETTE = [
+  [244, 109, 67],
+  [253, 174, 97],
+  [254, 224, 139],
+  [171, 221, 164],
+  [102, 194, 165],
+  [50, 136, 189],
+  [94, 79, 162],
+  [213, 62, 79],
+  [230, 97, 1],
+  [117, 112, 179],
+  [27, 158, 119],
+  [231, 138, 195],
+];
 
 const AGE_BIN_LABELS = [
   "0",
@@ -31,7 +56,7 @@ const METRIC_CARD_CONFIG = [
   { key: "young_dr", label: "Youth Dependency Ratio", formatter: (v) => formatDecimal(v, 3) },
   { key: "old_dr", label: "Old-Age Dependency Ratio", formatter: (v) => formatDecimal(v, 3) },
   { key: "total_sr", label: "Sex Ratio", formatter: (v) => formatDecimal(v, 3) },
-  { key: "women_cba", label: "Women CBA", formatter: formatPopulation },
+  { key: "women_cba", label: "Women of childbearing age", formatter: formatPopulation },
   { key: "general_fr", label: "General Fertility Rate", formatter: (v) => formatDecimal(v, 2) },
 ];
 
@@ -58,6 +83,9 @@ const state = {
   valuesPerYear: 0,
   cityById: new Map(),
   cityAxisById: new Map(),
+  cityIdsByCountry: new Map(),
+  metricIndexByKey: new Map(),
+  countryPlotDataByCountry: new Map(),
   series: null,
   seriesPromise: null,
   selectedCity: null,
@@ -66,9 +94,17 @@ const state = {
   dataDir: null,
   basemapTheme: "dark",
   gifReady: false,
+  sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
+  sidebarResizeFrame: null,
+  countryPlotMouse: {
+    active: false,
+    x: -1,
+    y: -1,
+  },
 };
 
 const sidebarEl = document.getElementById("sidebar");
+const sidebarResizeHandleEl = document.getElementById("sidebarResizeHandle");
 const closeSidebarButton = document.getElementById("closeSidebar");
 const cityTitleEl = document.getElementById("cityTitle");
 const cityMetaRowsEl = document.getElementById("cityMetaRows");
@@ -76,10 +112,14 @@ const statusTextEl = document.getElementById("statusText");
 const yearSliderEl = document.getElementById("yearSlider");
 const yearValueEl = document.getElementById("yearValue");
 const playPauseButtonEl = document.getElementById("playPauseButton");
+const downloadCountryGifButtonEl = document.getElementById("downloadCountryGifButton");
+const downloadCountryPngButtonEl = document.getElementById("downloadCountryPngButton");
 const downloadGifButtonEl = document.getElementById("downloadGifButton");
 const downloadTrendPngButtonEl = document.getElementById("downloadTrendPngButton");
 const basemapToggleButtonEl = document.getElementById("basemapToggle");
 const metricCardsEl = document.getElementById("metricCards");
+const countryPlotCanvasEl = document.getElementById("countryPlotCanvas");
+const countryPlotCtx = countryPlotCanvasEl.getContext("2d");
 const pyramidPlotEl = document.getElementById("pyramidPlot");
 const trendPlotEl = document.getElementById("trendPlot");
 
@@ -104,16 +144,28 @@ async function init() {
   state.years = cityIndex.years;
   state.ageColumns = cityIndex.age_columns;
   state.metricColumns = cityIndex.metric_columns;
+  state.metricIndexByKey = new Map(cityIndex.metric_columns.map((metricKey, index) => [metricKey, index]));
   state.valuesPerYear = cityIndex.values_per_year;
   state.selectedYearIdx = state.years.length - 1;
 
   for (const city of cityIndex.cities) {
     state.cityById.set(String(city.id), city);
+    const countryKey = city.country || "Unknown";
+    const existing = state.cityIdsByCountry.get(countryKey);
+    if (existing) {
+      existing.push(String(city.id));
+    } else {
+      state.cityIdsByCountry.set(countryKey, [String(city.id)]);
+    }
   }
 
   initMap(boundaries);
   bindUiEvents();
+  applySidebarWidth(getDefaultSidebarWidth());
+  initSidebarResizing();
+  observeSidebarResize();
   setControlsEnabled(false);
+  renderEmptyCountryPlot();
   prepareGifSupport();
 }
 
@@ -136,6 +188,20 @@ function bindUiEvents() {
     } else {
       startAnimation();
     }
+  });
+
+  downloadCountryGifButtonEl.addEventListener("click", () => {
+    if (!state.selectedCity) {
+      return;
+    }
+    downloadCountryPlotGif();
+  });
+
+  downloadCountryPngButtonEl.addEventListener("click", () => {
+    if (!state.selectedCity) {
+      return;
+    }
+    downloadCountryPlotPng();
   });
 
   downloadGifButtonEl.addEventListener("click", () => {
@@ -161,9 +227,129 @@ function bindUiEvents() {
     updateBasemapToggleButton();
   });
 
+  countryPlotCanvasEl.addEventListener("mousemove", (event) => {
+    if (!state.selectedCity || !state.series) {
+      return;
+    }
+    const rect = countryPlotCanvasEl.getBoundingClientRect();
+    const scaleX = countryPlotCanvasEl.width / rect.width;
+    const scaleY = countryPlotCanvasEl.height / rect.height;
+    state.countryPlotMouse = {
+      active: true,
+      x: (event.clientX - rect.left) * scaleX,
+      y: (event.clientY - rect.top) * scaleY,
+    };
+    renderCountryPlot(state.selectedYearIdx);
+  });
+
+  countryPlotCanvasEl.addEventListener("mouseleave", () => {
+    if (!state.countryPlotMouse.active) {
+      return;
+    }
+    state.countryPlotMouse = { active: false, x: -1, y: -1 };
+    if (state.selectedCity && state.series) {
+      renderCountryPlot(state.selectedYearIdx);
+    }
+  });
+
   closeSidebarButton.addEventListener("click", () => {
     stopAnimation();
     sidebarEl.classList.remove("open");
+  });
+
+  window.addEventListener("resize", () => {
+    applySidebarWidth(state.sidebarWidth);
+    scheduleSidebarPlotResize();
+  });
+}
+
+function initSidebarResizing() {
+  sidebarResizeHandleEl.addEventListener("pointerdown", (event) => {
+    if (event.button !== undefined && event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = Math.round(sidebarEl.getBoundingClientRect().width) || state.sidebarWidth;
+    sidebarEl.classList.add("resizing");
+
+    const onPointerMove = (moveEvent) => {
+      applySidebarWidth(startWidth + (moveEvent.clientX - startX));
+      scheduleSidebarPlotResize();
+    };
+
+    const onPointerUp = () => {
+      sidebarEl.classList.remove("resizing");
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      scheduleSidebarPlotResize();
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp, { once: true });
+    window.addEventListener("pointercancel", onPointerUp, { once: true });
+  });
+}
+
+function observeSidebarResize() {
+  if (typeof ResizeObserver === "undefined") {
+    return;
+  }
+
+  const observer = new ResizeObserver(() => {
+    scheduleSidebarPlotResize();
+  });
+  observer.observe(sidebarEl);
+}
+
+function applySidebarWidth(width) {
+  const clampedWidth = clampSidebarWidth(width);
+  state.sidebarWidth = clampedWidth;
+  document.documentElement.style.setProperty("--sidebar-width", `${clampedWidth}px`);
+}
+
+function getDefaultSidebarWidth() {
+  const proportionalWidth = Math.round(window.innerWidth * SIDEBAR_DEFAULT_WIDTH_RATIO);
+  return clampSidebarWidth(Math.max(SIDEBAR_DEFAULT_WIDTH, proportionalWidth));
+}
+
+function clampSidebarWidth(width) {
+  const viewportMax = Math.max(SIDEBAR_MIN_WIDTH, Math.min(SIDEBAR_MAX_WIDTH, window.innerWidth - 48));
+  return Math.round(Math.max(SIDEBAR_MIN_WIDTH, Math.min(viewportMax, width)));
+}
+
+function scheduleSidebarPlotResize() {
+  if (state.sidebarResizeFrame) {
+    window.cancelAnimationFrame(state.sidebarResizeFrame);
+  }
+
+  state.sidebarResizeFrame = window.requestAnimationFrame(() => {
+    state.sidebarResizeFrame = null;
+
+    if (state.selectedCity && state.series) {
+      renderCountryPlot(state.selectedYearIdx);
+    } else {
+      renderEmptyCountryPlot();
+    }
+
+    if (typeof Plotly !== "undefined" && typeof Plotly.Plots !== "undefined") {
+      try {
+        if (pyramidPlotEl.children.length) {
+          Plotly.Plots.resize(pyramidPlotEl);
+        }
+      } catch (_) {
+        // ignore Plotly resize errors during transitions
+      }
+      try {
+        if (trendPlotEl.children.length) {
+          Plotly.Plots.resize(trendPlotEl);
+        }
+      } catch (_) {
+        // ignore Plotly resize errors during transitions
+      }
+    }
   });
 }
 
@@ -223,6 +409,18 @@ function createMapStyle(theme) {
   };
 }
 
+function getCountryFillProperty() {
+  return state.basemapTheme === "dark" ? "CountryColorDark" : "CountryColorLight";
+}
+
+function getCountryOutlineProperty() {
+  return state.basemapTheme === "dark" ? "CountryOutlineDark" : "CountryOutlineLight";
+}
+
+function getCountryFillOpacity() {
+  return state.basemapTheme === "dark" ? 0.48 : 0.62;
+}
+
 function addCityLayers(boundaries) {
   state.map.addSource("cities", {
     type: "geojson",
@@ -236,8 +434,8 @@ function addCityLayers(boundaries) {
     type: "fill",
     source: "cities",
     paint: {
-      "fill-color": ["get", "CountryColor"],
-      "fill-opacity": 0.48,
+      "fill-color": ["get", getCountryFillProperty()],
+      "fill-opacity": getCountryFillOpacity(),
     },
   });
 
@@ -246,7 +444,7 @@ function addCityLayers(boundaries) {
     type: "line",
     source: "cities",
     paint: {
-      "line-color": ["get", "CountryOutline"],
+      "line-color": ["get", getCountryOutlineProperty()],
       "line-width": ["interpolate", ["linear"], ["zoom"], 1.2, 1.2, 4, 1.8, 7, 2.4, 10, 3],
       "line-opacity": 1,
     },
@@ -305,6 +503,7 @@ function addCityLayers(boundaries) {
 
     state.selectedCity = city;
     state.selectedYearIdx = state.years.length - 1;
+    state.countryPlotMouse = { active: false, x: -1, y: -1 };
     sidebarEl.classList.add("open");
     setControlsEnabled(true);
     updateMapSelection();
@@ -337,11 +536,11 @@ function applyBasemapTheme() {
   state.map.setLayoutProperty("basemap-light", "visibility", isDark ? "none" : "visible");
 
   if (state.map.getLayer("city-fill")) {
-    state.map.setPaintProperty("city-fill", "fill-color", ["get", "CountryColor"]);
-    state.map.setPaintProperty("city-fill", "fill-opacity", 0.48);
+    state.map.setPaintProperty("city-fill", "fill-color", ["get", getCountryFillProperty()]);
+    state.map.setPaintProperty("city-fill", "fill-opacity", getCountryFillOpacity());
   }
   if (state.map.getLayer("city-outline")) {
-    state.map.setPaintProperty("city-outline", "line-color", ["get", "CountryOutline"]);
+    state.map.setPaintProperty("city-outline", "line-color", ["get", getCountryOutlineProperty()]);
     state.map.setPaintProperty("city-outline", "line-opacity", 1);
   }
   if (state.map.getLayer("city-labels")) {
@@ -358,6 +557,8 @@ function applyBasemapTheme() {
 
   if (state.selectedCity && state.series) {
     renderSelectedYear();
+  } else {
+    renderEmptyCountryPlot();
   }
 }
 
@@ -371,6 +572,8 @@ function setControlsEnabled(enabled) {
   yearSliderEl.disabled = !enabled;
   playPauseButtonEl.disabled = !enabled;
   yearSliderEl.max = String(state.years.length - 1);
+  downloadCountryGifButtonEl.disabled = !enabled || !state.gifReady;
+  downloadCountryPngButtonEl.disabled = !enabled;
   downloadGifButtonEl.disabled = !enabled || !state.gifReady;
   downloadTrendPngButtonEl.disabled = !enabled;
 }
@@ -379,9 +582,11 @@ async function prepareGifSupport() {
   try {
     await ensureGifshotLoaded();
     state.gifReady = true;
+    downloadCountryGifButtonEl.title = "Download country population and dependency animation as a GIF.";
     downloadGifButtonEl.title = "Download population pyramid animation as a GIF.";
   } catch (error) {
     state.gifReady = false;
+    downloadCountryGifButtonEl.title = "GIF library failed to load.";
     downloadGifButtonEl.title = "GIF library failed to load.";
     // eslint-disable-next-line no-console
     console.error(error);
@@ -538,6 +743,7 @@ function renderSelectedYear() {
   const axisLimits = getCityAxisLimits(state.selectedCity);
 
   renderMetricCards(yearData.metrics);
+  renderCountryPlot(state.selectedYearIdx);
   renderPyramidPlot(yearData.ages, year, axisLimits);
   renderTrendPlot(year, axisLimits);
 }
@@ -557,8 +763,8 @@ function getCityYearData(city, yearIndex) {
 }
 
 function getMetricSeries(city, metricKey) {
-  const metricOffset = state.metricColumns.indexOf(metricKey);
-  if (metricOffset < 0) {
+  const metricOffset = state.metricIndexByKey.get(metricKey);
+  if (metricOffset === undefined) {
     return [];
   }
 
@@ -569,6 +775,17 @@ function getMetricSeries(city, metricKey) {
     series.push(sanitizeNumber(state.series[index]));
   }
   return series;
+}
+
+function getMetricValue(city, yearIndex, metricKey) {
+  const metricOffset = state.metricIndexByKey.get(metricKey);
+  if (metricOffset === undefined) {
+    return null;
+  }
+
+  const ageCount = state.ageColumns.length;
+  const index = city.series_index + yearIndex * state.valuesPerYear + ageCount + metricOffset;
+  return sanitizeNumber(state.series[index]);
 }
 
 function getCityAxisLimits(city) {
@@ -633,6 +850,420 @@ function renderMetricCards(metrics) {
       <p class="metric-value">${formatted}</p>
     </article>`;
   }).join("");
+}
+
+function renderEmptyCountryPlot(message = "Select a city to compare every city in that country through time.") {
+  const colors = getCountryPlotTheme();
+  const metrics = getCountryPlotMetrics(countryPlotCanvasEl);
+  countryPlotCtx.clearRect(0, 0, countryPlotCanvasEl.width, countryPlotCanvasEl.height);
+  countryPlotCtx.fillStyle = colors.canvasBg;
+  countryPlotCtx.fillRect(0, 0, countryPlotCanvasEl.width, countryPlotCanvasEl.height);
+
+  countryPlotCtx.fillStyle = colors.title;
+  countryPlotCtx.font = metrics.titleFont;
+  countryPlotCtx.textAlign = "center";
+  countryPlotCtx.textBaseline = "alphabetic";
+  countryPlotCtx.fillText("Urban Population vs Dependency Ratio", countryPlotCanvasEl.width / 2, metrics.titleY);
+
+  countryPlotCtx.fillStyle = colors.subtitle;
+  countryPlotCtx.font = metrics.subtitleFont;
+  countryPlotCtx.fillText("Country context opens here once a city is selected.", countryPlotCanvasEl.width / 2, metrics.subtitleY);
+
+  countryPlotCtx.fillStyle = colors.label;
+  countryPlotCtx.font = metrics.axisFont;
+  countryPlotCtx.textBaseline = "middle";
+  countryPlotCtx.fillText(message, countryPlotCanvasEl.width / 2, countryPlotCanvasEl.height / 2);
+}
+
+function renderCountryPlot(yearIndex) {
+  if (!state.selectedCity || !state.series) {
+    renderEmptyCountryPlot();
+    return;
+  }
+
+  const countryName = state.selectedCity.country || "Unknown";
+  const plotData = getCountryPlotData(countryName);
+  renderCountryPlotFrame(countryPlotCtx, countryPlotCanvasEl, plotData, yearIndex, {
+    selectedCityId: String(state.selectedCity.id),
+    mouse: state.countryPlotMouse,
+    includeWatermark: false,
+  });
+}
+
+function getCountryPlotData(countryName) {
+  const cached = state.countryPlotDataByCountry.get(countryName);
+  if (cached) {
+    return cached;
+  }
+
+  const cityIds = state.cityIdsByCountry.get(countryName) || [];
+  const pointsByYear = state.years.map(() => []);
+  const popValues = [];
+  const drValues = [];
+
+  for (const cityId of cityIds) {
+    const city = state.cityById.get(cityId);
+    if (!city) {
+      continue;
+    }
+
+    const color = COUNTRY_PLOT_PALETTE[stableIndexForText(cityId, COUNTRY_PLOT_PALETTE.length)];
+    for (let yearIdx = 0; yearIdx < state.years.length; yearIdx += 1) {
+      const totalPop = getMetricValue(city, yearIdx, "total_pop");
+      const totalDr = getMetricValue(city, yearIdx, "total_dr");
+      if (totalPop === null || totalPop <= 0 || totalDr === null) {
+        continue;
+      }
+
+      pointsByYear[yearIdx].push({
+        cityId,
+        cityName: sanitizeCityName(city.name),
+        totalPop,
+        totalDr,
+        color,
+      });
+      popValues.push(totalPop);
+      drValues.push(totalDr);
+    }
+  }
+
+  const plotData = {
+    countryName,
+    axisLimits: computeCountryPlotAxisLimits(popValues, drValues),
+    pointsByYear,
+  };
+  state.countryPlotDataByCountry.set(countryName, plotData);
+  return plotData;
+}
+
+function computeCountryPlotAxisLimits(popValues, drValues) {
+  const safePopValues = popValues.filter((value) => Number.isFinite(value) && value > 0);
+  const safeDrValues = drValues.filter((value) => Number.isFinite(value));
+
+  const minPop = safePopValues.length ? Math.min(...safePopValues) : 1;
+  const maxPop = safePopValues.length ? Math.max(...safePopValues) : 10;
+  const minLog = Math.log10(minPop);
+  const maxLog = Math.log10(maxPop);
+  const logSpan = maxLog - minLog;
+  const logPad = Math.max(0.018, logSpan * 0.045);
+  let xMin = Math.max(1, 10 ** (minLog - logPad));
+  let xMax = 10 ** (maxLog + logPad);
+  if (!Number.isFinite(xMin) || !Number.isFinite(xMax) || xMax <= xMin) {
+    xMin = Math.max(1, minPop * 0.94);
+    xMax = Math.max(xMin * 1.12, maxPop * 1.06);
+  }
+
+  const drMax = Math.max(...safeDrValues, 0);
+  const yFloor = 0;
+  const yBaseCeiling = 1.5;
+  const yPad = Math.max(0.03, drMax * 0.05);
+  const yUpperTarget = Math.max(yBaseCeiling, drMax + yPad);
+  const yTicks = buildLinearTicks(yFloor, yUpperTarget, 6);
+
+  return {
+    xMin,
+    xMax,
+    xTicks: buildCountryPlotXTicks(xMin, xMax),
+    yMin: yFloor,
+    yMax: yTicks[yTicks.length - 1],
+    yTicks,
+  };
+}
+
+function renderCountryPlotFrame(targetCtx, targetCanvas, plotData, yearIndex, options = {}) {
+  const colors = getCountryPlotTheme();
+  const metrics = getCountryPlotMetrics(targetCanvas, options);
+  const axisLimits = plotData.axisLimits;
+  const safeYearIndex = Math.max(0, Math.min(yearIndex, state.years.length - 1));
+  const targetYear = state.years[safeYearIndex];
+  const geom = getCountryPlotGeometry(targetCanvas, metrics);
+  const mouse = options.mouse || { active: false, x: -1, y: -1 };
+  const selectedCityId = options.selectedCityId || "";
+  const selectedPoints = [];
+  let hoverCandidate = null;
+
+  targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+  targetCtx.fillStyle = colors.canvasBg;
+  targetCtx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+
+  drawCountryPlotAxes(targetCtx, targetCanvas, axisLimits, geom, colors, metrics);
+
+  for (let visibleYearIdx = 0; visibleYearIdx <= safeYearIndex; visibleYearIdx += 1) {
+    const points = plotData.pointsByYear[visibleYearIdx];
+    const isCurrentYear = visibleYearIdx === safeYearIndex;
+
+    for (const point of points) {
+      const drawablePoint = {
+        ...point,
+        x: toCountryPlotX(point.totalPop, axisLimits.xMin, axisLimits.xMax, geom),
+        y: toCountryPlotY(point.totalDr, axisLimits.yMin, axisLimits.yMax, geom),
+        isCurrentYear,
+        isSelected: point.cityId === selectedCityId,
+      };
+
+      if (drawablePoint.isSelected) {
+        selectedPoints.push(drawablePoint);
+      } else {
+        drawCountryPlotPoint(targetCtx, drawablePoint, colors, metrics);
+      }
+
+      if (mouse.active) {
+        const radius = getCountryPlotRadius(drawablePoint, metrics);
+        const distance = Math.hypot(mouse.x - drawablePoint.x, mouse.y - drawablePoint.y);
+        if (distance <= radius + 2) {
+          if (
+            hoverCandidate === null ||
+            distance < hoverCandidate.distance ||
+            (drawablePoint.isCurrentYear && !hoverCandidate.isCurrentYear)
+          ) {
+            hoverCandidate = { ...drawablePoint, distance };
+          }
+        }
+      }
+    }
+  }
+
+  for (const point of selectedPoints) {
+    drawCountryPlotPoint(targetCtx, point, colors, metrics);
+  }
+
+  if (hoverCandidate) {
+    drawCountryPlotHover(targetCtx, hoverCandidate, colors, metrics);
+  }
+
+  targetCtx.font = metrics.titleFont;
+  targetCtx.fillStyle = colors.title;
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "alphabetic";
+  targetCtx.fillText("Urban Population vs Dependency Ratio", targetCanvas.width / 2, metrics.titleY);
+  targetCtx.font = metrics.subtitleFont;
+  targetCtx.fillStyle = colors.subtitle;
+  targetCtx.fillText(`${plotData.countryName} · ${targetYear}`, targetCanvas.width / 2, metrics.subtitleY);
+
+  if (options.includeWatermark) {
+    drawExportWatermark(targetCtx, targetCanvas.width, targetCanvas.height, colors);
+  }
+}
+
+function drawCountryPlotPoint(targetCtx, point, colors, metrics) {
+  const radius = getCountryPlotRadius(point, metrics);
+  const alpha = point.isSelected
+    ? point.isCurrentYear ? 0.98 : 0.42
+    : point.isCurrentYear ? 0.9 : 0.2;
+  const fillColor = point.isSelected
+    ? rgbaFromArray(colors.selectedFill, alpha)
+    : rgbaFromArray(point.color, alpha);
+
+  targetCtx.beginPath();
+  targetCtx.fillStyle = fillColor;
+  targetCtx.arc(point.x, point.y, radius, 0, 2 * Math.PI);
+  targetCtx.fill();
+  targetCtx.lineWidth = point.isSelected ? metrics.selectedStrokeWidth : point.isCurrentYear ? metrics.pointStrokeWidth : metrics.pointStrokeWidthSoft;
+  targetCtx.strokeStyle = point.isSelected
+    ? colors.selectedStroke
+    : point.isCurrentYear ? colors.pointStrokeCurrent : colors.pointStroke;
+  targetCtx.stroke();
+}
+
+function drawCountryPlotHover(targetCtx, hoverPoint, colors, metrics) {
+  const padding = metrics.hoverPadding;
+  const statsText = `${formatCompactUpper(hoverPoint.totalPop)} · ${formatDecimal(hoverPoint.totalDr, 2)}`;
+  targetCtx.font = metrics.axisFont;
+  const nameWidth = targetCtx.measureText(hoverPoint.cityName).width;
+  targetCtx.font = metrics.subtitleFont;
+  const statsWidth = targetCtx.measureText(statsText).width;
+  const boxWidth = Math.max(nameWidth, statsWidth) + padding * 2;
+  const boxHeight = metrics.hoverBoxHeight;
+  const boxX = Math.max(metrics.hoverEdgePadding, Math.min(
+    hoverPoint.x - boxWidth / 2,
+    targetCtx.canvas.width - boxWidth - metrics.hoverEdgePadding
+  ));
+  const boxY = Math.max(metrics.hoverMinTop, hoverPoint.y - boxHeight - metrics.hoverPointerGap);
+
+  drawRoundedRectPath(targetCtx, boxX, boxY, boxWidth, boxHeight, metrics.hoverRadius);
+  targetCtx.fillStyle = colors.hoverBg;
+  targetCtx.fill();
+  targetCtx.strokeStyle = colors.hoverBorder;
+  targetCtx.lineWidth = metrics.hoverBorderWidth;
+  targetCtx.stroke();
+
+  targetCtx.fillStyle = colors.hoverText;
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+  targetCtx.font = metrics.axisFont;
+  targetCtx.fillText(hoverPoint.cityName, boxX + boxWidth / 2, boxY + boxHeight / 2 - metrics.hoverNameOffset);
+  targetCtx.fillStyle = colors.subtitle;
+  targetCtx.font = metrics.subtitleFont;
+  targetCtx.fillText(statsText, boxX + boxWidth / 2, boxY + boxHeight / 2 + metrics.hoverStatsOffset);
+}
+
+function drawCountryPlotAxes(targetCtx, targetCanvas, axisLimits, geom, colors, metrics) {
+  targetCtx.font = metrics.axisFont;
+  targetCtx.fillStyle = colors.label;
+  targetCtx.strokeStyle = colors.axisStrong;
+  targetCtx.lineWidth = metrics.axisLineWidth;
+
+  targetCtx.beginPath();
+  targetCtx.moveTo(geom.left, geom.top);
+  targetCtx.lineTo(geom.left, geom.bottom);
+  targetCtx.lineTo(geom.right, geom.bottom);
+  targetCtx.stroke();
+
+  targetCtx.strokeStyle = colors.grid;
+  targetCtx.textAlign = "right";
+  targetCtx.textBaseline = "middle";
+  for (const tick of axisLimits.yTicks) {
+    const py = toCountryPlotY(tick, axisLimits.yMin, axisLimits.yMax, geom);
+    targetCtx.beginPath();
+    targetCtx.moveTo(geom.left, py);
+    targetCtx.lineTo(geom.right, py);
+    targetCtx.stroke();
+    targetCtx.fillStyle = colors.label;
+    targetCtx.fillText(formatDecimal(tick, 2), geom.left - metrics.yTickPadding, py);
+  }
+
+  targetCtx.strokeStyle = colors.tickMinor;
+  targetCtx.lineWidth = metrics.minorTickWidth;
+  const logMin = Math.floor(Math.log10(axisLimits.xMin));
+  const logMax = Math.ceil(Math.log10(axisLimits.xMax));
+  for (let decade = logMin; decade <= logMax; decade += 1) {
+    const base = 10 ** decade;
+    for (const factor of COUNTRY_PLOT_LOG_MULTIPLIERS) {
+      if (factor === 1) {
+        continue;
+      }
+      const value = base * factor;
+      if (value < axisLimits.xMin || value > axisLimits.xMax) {
+        continue;
+      }
+      const px = toCountryPlotX(value, axisLimits.xMin, axisLimits.xMax, geom);
+      targetCtx.beginPath();
+      targetCtx.moveTo(px, geom.bottom);
+      targetCtx.lineTo(px, geom.bottom + metrics.minorTickLength);
+      targetCtx.stroke();
+    }
+  }
+
+  targetCtx.lineWidth = metrics.majorTickWidth;
+  for (const tick of axisLimits.xTicks) {
+    if (tick < axisLimits.xMin || tick > axisLimits.xMax) {
+      continue;
+    }
+    const px = toCountryPlotX(tick, axisLimits.xMin, axisLimits.xMax, geom);
+    targetCtx.strokeStyle = colors.grid;
+    targetCtx.beginPath();
+    targetCtx.moveTo(px, geom.top);
+    targetCtx.lineTo(px, geom.bottom);
+    targetCtx.stroke();
+    targetCtx.strokeStyle = colors.axisStrong;
+    targetCtx.beginPath();
+    targetCtx.moveTo(px, geom.bottom);
+    targetCtx.lineTo(px, geom.bottom + metrics.majorTickLength);
+    targetCtx.stroke();
+    targetCtx.fillStyle = colors.label;
+    targetCtx.textAlign = "center";
+    targetCtx.textBaseline = "top";
+    targetCtx.fillText(formatCompactUpper(tick), px, geom.bottom + metrics.xTickLabelOffset);
+  }
+
+  targetCtx.save();
+  targetCtx.fillStyle = colors.label;
+  targetCtx.translate(metrics.yAxisLabelX, geom.top + geom.height / 2);
+  targetCtx.rotate(-Math.PI / 2);
+  targetCtx.textAlign = "center";
+  targetCtx.fillText("Total Dependency Ratio", 0, 0);
+  targetCtx.restore();
+
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "top";
+  targetCtx.fillStyle = colors.label;
+  targetCtx.fillText("Total Population", geom.left + geom.width / 2, geom.bottom + metrics.xAxisLabelOffset);
+}
+
+function getCountryPlotGeometry(targetCanvas, metrics) {
+  const left = metrics.marginLeft;
+  const right = targetCanvas.width - metrics.marginRight;
+  const top = metrics.marginTop;
+  const bottom = targetCanvas.height - metrics.marginBottom;
+  return {
+    left,
+    right,
+    top,
+    bottom,
+    width: right - left,
+    height: bottom - top,
+  };
+}
+
+function getCountryPlotMetrics(targetCanvas, options = {}) {
+  const scale = getCountryPlotDisplayScale(targetCanvas, options);
+  const axisFontSize = Math.max(11, Math.round(COUNTRY_PLOT_BASE_FONT_SIZE * scale));
+  const titleFontSize = Math.max(13, Math.round(COUNTRY_PLOT_BASE_TITLE_FONT_SIZE * scale));
+  const subtitleFontSize = Math.max(11, Math.round(COUNTRY_PLOT_BASE_SUBTITLE_FONT_SIZE * scale));
+
+  return {
+    scale,
+    axisFont: `${axisFontSize}px "IBM Plex Mono", monospace`,
+    titleFont: `500 ${titleFontSize}px "IBM Plex Mono", monospace`,
+    subtitleFont: `${subtitleFontSize}px "IBM Plex Mono", monospace`,
+    titleY: Math.round(24 * scale),
+    subtitleY: Math.round(44 * scale),
+    marginLeft: Math.round(94 * scale),
+    marginRight: Math.round(30 * scale),
+    marginTop: Math.round(92 * scale),
+    marginBottom: Math.round(58 * scale),
+    axisLineWidth: Math.max(1, 1 * scale),
+    pointStrokeWidth: Math.max(1, 1 * scale),
+    pointStrokeWidthSoft: Math.max(0.8, 0.8 * scale),
+    selectedStrokeWidth: Math.max(1.25, 1.35 * scale),
+    minorTickWidth: Math.max(0.8, 0.8 * scale),
+    majorTickWidth: Math.max(1, 1 * scale),
+    minorTickLength: Math.round(6 * scale),
+    majorTickLength: Math.round(8 * scale),
+    xTickLabelOffset: Math.round(10 * scale),
+    yTickPadding: Math.round(8 * scale),
+    yAxisLabelX: Math.round(42 * scale),
+    xAxisLabelOffset: Math.round(34 * scale),
+    hoverPadding: Math.round(10 * scale),
+    hoverRadius: Math.round(6 * scale),
+    hoverBorderWidth: Math.max(1, 1 * scale),
+    hoverBoxHeight: Math.round(44 * scale),
+    hoverEdgePadding: Math.round(12 * scale),
+    hoverMinTop: Math.round(68 * scale),
+    hoverPointerGap: Math.round(12 * scale),
+    hoverNameOffset: Math.round(8 * scale),
+    hoverStatsOffset: Math.round(10 * scale),
+  };
+}
+
+function getCountryPlotDisplayScale(targetCanvas, options = {}) {
+  if (Number.isFinite(options.displayScale) && options.displayScale > 0) {
+    return options.displayScale;
+  }
+  if (!targetCanvas || typeof targetCanvas.getBoundingClientRect !== "function") {
+    return 1;
+  }
+  const rect = targetCanvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    return 1;
+  }
+  return Math.max(targetCanvas.width / rect.width, targetCanvas.height / rect.height);
+}
+
+function toCountryPlotX(value, xMin, xMax, geom) {
+  return geom.left + ((Math.log10(value) - Math.log10(xMin)) / (Math.log10(xMax) - Math.log10(xMin))) * geom.width;
+}
+
+function toCountryPlotY(value, yMin, yMax, geom) {
+  return geom.bottom - ((value - yMin) / (yMax - yMin)) * geom.height;
+}
+
+function getCountryPlotRadius(point, metrics) {
+  const scale = metrics && Number.isFinite(metrics.scale) ? metrics.scale : 1;
+  if (point.isSelected) {
+    return (point.isCurrentYear ? 5.8 : 3.5) * scale;
+  }
+  return (point.isCurrentYear ? 4.6 : 2.1) * scale;
 }
 
 function renderPyramidPlot(ages, year, axisLimits) {
@@ -877,6 +1508,100 @@ function stopAnimation() {
   playPauseButtonEl.textContent = "Play";
 }
 
+async function downloadCountryPlotGif() {
+  if (!state.selectedCity || !state.series) {
+    return;
+  }
+  if (!state.gifReady) {
+    await prepareGifSupport();
+  }
+  if (!state.gifReady) {
+    statusTextEl.textContent = "GIF export unavailable: gifshot library could not be loaded.";
+    return;
+  }
+
+  stopAnimation();
+  downloadCountryGifButtonEl.disabled = true;
+  statusTextEl.textContent = "Rendering country frames for GIF...";
+
+  try {
+    const plotData = getCountryPlotData(state.selectedCity.country || "Unknown");
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = COUNTRY_PLOT_CANVAS_WIDTH;
+    exportCanvas.height = COUNTRY_PLOT_CANVAS_HEIGHT;
+    const exportCtx = exportCanvas.getContext("2d");
+    const images = [];
+
+    for (let yearIdx = 0; yearIdx < state.years.length; yearIdx += 1) {
+      renderCountryPlotFrame(exportCtx, exportCanvas, plotData, yearIdx, {
+        displayScale: getCountryPlotDisplayScale(countryPlotCanvasEl),
+        selectedCityId: String(state.selectedCity.id),
+        includeWatermark: true,
+      });
+      images.push(exportCanvas.toDataURL("image/png"));
+    }
+
+    statusTextEl.textContent = "Encoding GIF...";
+    const gifDataUri = await createGifFromImages(
+      images,
+      exportCanvas.width,
+      exportCanvas.height,
+      GIF_FRAME_INTERVAL_SECONDS
+    );
+    const fileBase = slugify(state.selectedCity.country || state.selectedCity.name || `city_${state.selectedCity.id}`);
+    triggerDownload(gifDataUri, `${fileBase}_country_population_dependency_2000_2020.gif`);
+    statusTextEl.textContent = "GIF downloaded.";
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    statusTextEl.textContent = `GIF export failed: ${message}`;
+    // eslint-disable-next-line no-console
+    console.error(error);
+  } finally {
+    setControlsEnabled(Boolean(state.selectedCity));
+  }
+}
+
+async function downloadCountryPlotPng() {
+  if (!state.selectedCity || !state.series) {
+    return;
+  }
+
+  downloadCountryPngButtonEl.disabled = true;
+  statusTextEl.textContent = "Rendering high-resolution country PNG...";
+
+  try {
+    const plotData = getCountryPlotData(state.selectedCity.country || "Unknown");
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = COUNTRY_PLOT_CANVAS_WIDTH * PNG_EXPORT_SCALE;
+    exportCanvas.height = COUNTRY_PLOT_CANVAS_HEIGHT * PNG_EXPORT_SCALE;
+    const exportCtx = exportCanvas.getContext("2d");
+    exportCtx.setTransform(PNG_EXPORT_SCALE, 0, 0, PNG_EXPORT_SCALE, 0, 0);
+
+    renderCountryPlotFrame(
+      exportCtx,
+      { width: COUNTRY_PLOT_CANVAS_WIDTH, height: COUNTRY_PLOT_CANVAS_HEIGHT },
+      plotData,
+      state.selectedYearIdx,
+      {
+        displayScale: getCountryPlotDisplayScale(countryPlotCanvasEl),
+        selectedCityId: String(state.selectedCity.id),
+        includeWatermark: true,
+      }
+    );
+
+    const fileBase = slugify(state.selectedCity.country || state.selectedCity.name || `city_${state.selectedCity.id}`);
+    triggerDownload(exportCanvas.toDataURL("image/png"), `${fileBase}_country_population_dependency_${state.years[state.selectedYearIdx]}.png`);
+    statusTextEl.textContent = "PNG downloaded.";
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    statusTextEl.textContent = `PNG export failed: ${message}`;
+    // eslint-disable-next-line no-console
+    console.error(error);
+  } finally {
+    setControlsEnabled(Boolean(state.selectedCity));
+  }
+}
+
 async function downloadPyramidGif() {
   if (!state.selectedCity || !state.series) {
     return;
@@ -918,19 +1643,14 @@ async function downloadPyramidGif() {
         height: frameHeight,
         scale: 1,
       });
-      images.push(image);
+      images.push(await addWatermarkToImageDataUrl(image));
     }
 
     statusTextEl.textContent = "Encoding GIF...";
     const gifDataUri = await createGifFromImages(images, frameWidth, frameHeight, GIF_FRAME_INTERVAL_SECONDS);
     const fileBase = slugify(state.selectedCity.name || `city_${state.selectedCity.id}`);
 
-    const link = document.createElement("a");
-    link.href = gifDataUri;
-    link.download = `${fileBase}_population_pyramid_2000_2020.gif`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    triggerDownload(gifDataUri, `${fileBase}_population_pyramid_2000_2020.gif`);
 
     statusTextEl.textContent = "GIF downloaded.";
   } catch (error) {
@@ -967,13 +1687,9 @@ async function downloadTrendPng() {
       height: exportSize.height,
       scale: PNG_EXPORT_SCALE,
     });
+    const imageWithWatermark = await addWatermarkToImageDataUrl(imageData);
     const fileBase = slugify(state.selectedCity.name || `city_${state.selectedCity.id}`);
-    const link = document.createElement("a");
-    link.href = imageData;
-    link.download = `${fileBase}_population_dependency_300dpi.png`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    triggerDownload(imageWithWatermark, `${fileBase}_population_dependency_300dpi.png`);
     statusTextEl.textContent = "PNG downloaded.";
   } catch (error) {
     const message = error && error.message ? error.message : String(error);
@@ -1005,6 +1721,52 @@ function createGifFromImages(images, width, height, intervalSeconds) {
   });
 }
 
+function triggerDownload(url, filename) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+async function addWatermarkToImageDataUrl(dataUrl) {
+  const image = await loadImage(dataUrl);
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = image.naturalWidth || image.width;
+  exportCanvas.height = image.naturalHeight || image.height;
+  const exportCtx = exportCanvas.getContext("2d");
+  exportCtx.drawImage(image, 0, 0, exportCanvas.width, exportCanvas.height);
+  drawExportWatermark(exportCtx, exportCanvas.width, exportCanvas.height, getCountryPlotTheme());
+  return exportCanvas.toDataURL("image/png");
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Failed to load exported image."));
+    image.src = src;
+  });
+}
+
+function drawExportWatermark(targetCtx, width, height, colors) {
+  const padding = Math.max(8, Math.round(Math.min(width, height) * 0.014));
+  const fontSize = Math.max(8, Math.round(Math.min(width, height) * 0.0118));
+  const lineHeight = Math.max(7, Math.round(fontSize * 1.18));
+  const bottomY = height - padding;
+  targetCtx.save();
+  targetCtx.fillStyle = colors.watermarkText;
+  targetCtx.globalAlpha = 0.4;
+  targetCtx.textAlign = "right";
+  targetCtx.textBaseline = "alphabetic";
+  targetCtx.font = `500 ${fontSize}px "IBM Plex Mono", monospace`;
+  targetCtx.fillText(EXPORT_WATERMARK_LINES[0], width - padding, bottomY - lineHeight);
+  targetCtx.font = `italic 500 ${fontSize}px "IBM Plex Mono", monospace`;
+  targetCtx.fillText(EXPORT_WATERMARK_LINES[1], width - padding, bottomY);
+  targetCtx.restore();
+}
+
 function buildZeroBasedTicks(maxValue) {
   const safeMax = Math.max(1, maxValue);
   const rawStep = safeMax / 4;
@@ -1015,6 +1777,47 @@ function buildZeroBasedTicks(maxValue) {
     ticks.push(value);
   }
   return ticks;
+}
+
+function buildLinearTicks(minValue, maxValue, desiredCount = 6) {
+  if (!Number.isFinite(minValue) || !Number.isFinite(maxValue) || minValue === maxValue) {
+    const center = Number.isFinite(minValue) ? minValue : 0;
+    return [center - 0.1, center, center + 0.1];
+  }
+
+  const rawStep = Math.abs(maxValue - minValue) / Math.max(1, desiredCount - 1);
+  const step = computeNiceStep(Math.max(rawStep, 0.001));
+  const start = Math.floor(minValue / step) * step;
+  const end = Math.ceil(maxValue / step) * step;
+  const ticks = [];
+  for (let value = start; value <= end + step * 0.5; value += step) {
+    ticks.push(Number(value.toFixed(10)));
+  }
+  return ticks;
+}
+
+function buildCountryPlotXTicks(xMin, xMax) {
+  const ticks = [];
+  const startExponent = Math.floor(Math.log10(xMin));
+  const endExponent = Math.ceil(Math.log10(xMax));
+
+  for (let exponent = startExponent; exponent <= endExponent; exponent += 1) {
+    const magnitude = 10 ** exponent;
+    for (const multiplier of COUNTRY_PLOT_LOG_MULTIPLIERS) {
+      const value = multiplier * magnitude;
+      if (value < xMin || value > xMax) {
+        continue;
+      }
+      ticks.push(value);
+    }
+  }
+
+  if (ticks.length < 2) {
+    ticks.unshift(xMin);
+    ticks.push(xMax);
+  }
+
+  return Array.from(new Set(ticks.map((value) => Number(value.toPrecision(12))))).sort((a, b) => a - b);
 }
 
 function computeNiceStep(rawStep) {
@@ -1076,6 +1879,53 @@ function getPlotTheme() {
     hoverBorder: "rgba(55,74,97,0.38)",
     hoverText: "#24364a",
     verticalMarker: "rgba(37,48,66,0.5)",
+  };
+}
+
+function getCountryPlotTheme() {
+  const plotTheme = getPlotTheme();
+  if (state.basemapTheme === "dark") {
+    return {
+      canvasBg: plotTheme.plotBg,
+      axisStrong: plotTheme.axisLine,
+      grid: plotTheme.grid,
+      gridSoft: plotTheme.gridSoft,
+      label: plotTheme.text,
+      title: plotTheme.text,
+      subtitle: "#a9c5e2",
+      hoverBg: plotTheme.hoverBg,
+      hoverBorder: plotTheme.hoverBorder,
+      hoverText: plotTheme.hoverText,
+      pointStroke: "rgba(206, 229, 252, 0.42)",
+      pointStrokeCurrent: "rgba(234, 248, 255, 0.88)",
+      tickMinor: plotTheme.gridSoft,
+      selectedFill: [255, 209, 102],
+      selectedStroke: "#fff4cf",
+      watermarkBg: "rgba(12, 24, 38, 0.72)",
+      watermarkBorder: "rgba(170, 203, 235, 0.32)",
+      watermarkText: "rgba(230, 242, 255, 0.88)",
+    };
+  }
+
+  return {
+    canvasBg: plotTheme.plotBg,
+    axisStrong: plotTheme.axisLine,
+    grid: plotTheme.grid,
+    gridSoft: plotTheme.gridSoft,
+    label: plotTheme.text,
+    title: plotTheme.text,
+    subtitle: "#4f6b86",
+    hoverBg: plotTheme.hoverBg,
+    hoverBorder: plotTheme.hoverBorder,
+    hoverText: plotTheme.hoverText,
+    pointStroke: "rgba(36, 56, 79, 0.38)",
+    pointStrokeCurrent: "rgba(16, 35, 53, 0.74)",
+    tickMinor: plotTheme.gridSoft,
+    selectedFill: [227, 106, 63],
+    selectedStroke: "#6e2f10",
+    watermarkBg: "rgba(255, 252, 243, 0.84)",
+    watermarkBorder: "rgba(55, 74, 97, 0.18)",
+    watermarkText: "rgba(36, 56, 79, 0.76)",
   };
 }
 
@@ -1141,6 +1991,42 @@ function formatCompactSigned(value) {
   }
   const sign = value < 0 ? "-" : "";
   return `${sign}${formatCompactUpper(Math.abs(value))}`;
+}
+
+function sanitizeCityName(name) {
+  if (name === null || name === undefined || Number.isNaN(name)) {
+    return "Unknown city";
+  }
+  const text = String(name).trim();
+  return text && text !== "NaN" ? text : "Unknown city";
+}
+
+function stableIndexForText(text, size) {
+  let value = 0;
+  const input = String(text);
+  for (let index = 0; index < input.length; index += 1) {
+    value = (value + (index + 1) * input.charCodeAt(index)) % 2147483647;
+  }
+  return value % size;
+}
+
+function rgbaFromArray(rgb, alpha) {
+  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
+function drawRoundedRectPath(targetCtx, x, y, width, height, radius) {
+  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+  targetCtx.beginPath();
+  targetCtx.moveTo(x + safeRadius, y);
+  targetCtx.lineTo(x + width - safeRadius, y);
+  targetCtx.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+  targetCtx.lineTo(x + width, y + height - safeRadius);
+  targetCtx.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+  targetCtx.lineTo(x + safeRadius, y + height);
+  targetCtx.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+  targetCtx.lineTo(x, y + safeRadius);
+  targetCtx.quadraticCurveTo(x, y, x + safeRadius, y);
+  targetCtx.closePath();
 }
 
 function trimDecimal(value) {

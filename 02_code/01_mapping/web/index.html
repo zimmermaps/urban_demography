@@ -18,6 +18,7 @@
 <body class="theme-dark">
   <main id="app">
     <section id="sidebar" class="sidebar">
+      <div id="sidebarResizeHandle" class="sidebar-resize-handle" aria-hidden="true"></div>
       <button id="closeSidebar" class="close-button" type="button" aria-label="Close panel">Close</button>
       <header class="sidebar-header">
         <h1 id="cityTitle">Select a City</h1>
@@ -34,6 +35,33 @@
           <input id="yearSlider" type="range" min="0" max="20" step="1" value="20" disabled>
           <span id="yearValue" class="year-value">2020</span>
           <button id="playPauseButton" type="button" class="play-button" disabled>Play</button>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-title-row">
+          <h2 class="section-title">Country Population and Dependency</h2>
+          <div class="section-actions">
+            <button
+              id="downloadCountryGifButton"
+              type="button"
+              class="play-button icon-button"
+              title="Download country population and dependency GIF"
+              aria-label="Download country population and dependency GIF"
+              disabled
+            >GIF↓</button>
+            <button
+              id="downloadCountryPngButton"
+              type="button"
+              class="play-button icon-button"
+              title="Download country population and dependency PNG"
+              aria-label="Download country population and dependency PNG"
+              disabled
+            >PNG↓</button>
+          </div>
+        </div>
+        <div id="countryPlotFrame" class="plot canvas-plot-frame">
+          <canvas id="countryPlotCanvas" class="country-plot-canvas" width="980" height="680"></canvas>
         </div>
       </section>
 
@@ -73,7 +101,7 @@
       </section>
 
       <section class="data-source">
-        Data from Zimmer et al., <em>Global Urban Demographic Change and Migration Patterns</em>.
+        Data from Zimmer et al., <em>Global Divergence in Urban Demographic Change and Migration Patterns</em>.
         <a href="https://github.com/zimmermaps/urban_demography" target="_blank" rel="noreferrer noopener">Repository</a>
       </section>
     </section>
@@ -82,7 +110,7 @@
       <div class="top-ribbon">
         <div class="title-block">
           <h2>Global Urban Demographic Dataset (GUDD) Explorer</h2>
-          <p class="title-subtext">Explore and click a city for a demographic breakdown.</p>
+          <p class="title-subtext">Explore and click a city for country-level context and city demographic breakdowns.</p>
           <p class="title-meta">
             <a
               class="repo-link"
@@ -95,18 +123,7 @@
               </svg>
               <span>GitHub Repository</span>
             </a>
-            <a
-              class="meta-link"
-              href="../../../docs/interactive_population_animation.html"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 20h16v-2H4v2Zm2-4h2V9H6v7Zm5 0h2V4h-2v12Zm5 0h2v-9h-2v9Z"></path>
-              </svg>
-              <span>More Dynamic Plots</span>
-            </a>
-            <span>Zimmer et al., <em>Global Urban Demographic Change and Migration Patterns</em></span>
+            <span>Zimmer et al., (2026). Global Divergence in Urban Demographic Change and Migration Patterns. Nature Cities. Accepted.</span>
           </p>
         </div>
         <div class="top-right-controls">

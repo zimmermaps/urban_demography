@@ -1,4 +1,4 @@
-# Global Urban Demographic Change and Migration Patterns 🌍 🌆 👪
+# Global Divergence in Urban Demographic Change and Migration Patterns 🌍 🌆 👪
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ---
 
@@ -8,6 +8,8 @@
 ## Overview
 
 This repository accompanies the manuscript and provides access to the code and data for globally consistent, city-level estimates of urban demographic structure, natural change, and migration for > 10,000 cities from 2000–2020 using both static and dynamically evolving urban boundaries.
+
+Explore the data and visualizations here: [GUDD Explorer](https://zimmermaps.github.io/urban_demography/gudd-explorer/).
 
 ### Change in Urban Dependency Ratio Between 2000-2020
 
@@ -34,7 +36,6 @@ This repository accompanies the manuscript and provides access to the code and d
   </tr>
 </table>  
 
-View this [interactive population animation](https://zimmermaps.github.io/urban_demography/interactive_population_animation.html) to explore plots for all countries!
 
 ## What This Repository Provides
 
@@ -263,16 +264,19 @@ Typical install time: 5-10 minutes
 Typical demo time: 5-10 minutes
 
 ```bash
-# requires Python 3.11 or newer
-python --version
+# use Python 3.11 for the most reproducible notebook setup
+python3.11 --version
 
 # clone repository
 cd /folder/you_want/this_repo/to_be
 git clone https://github.com/zimmermaps/urban_demography.git
 cd urban_demography
 
+# if you already have a broken .venv, rename or remove it first
+# mv .venv .venv.broken
+
 # set up virtual environment
-python -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate       # macOS/Linux
 # .venv\Scripts\activate        # Windows
 
@@ -280,8 +284,8 @@ source .venv/bin/activate       # macOS/Linux
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# register the virtual environment as a Jupyter kernel
-python -m ipykernel install --user --name urban_demography --display-name "Python (.venv urban_demography)"
+# register the virtual environment as a project-local Jupyter kernel
+python -m ipykernel install --sys-prefix --name urban-demography-venv --display-name ".venv (urban_demography, py3.11)"
 
 # unzip datasets (run from repo root - urban_demography)
 # macOS/Linux: unzip should be installed by default
@@ -309,6 +313,7 @@ unzip ./01_data/04_final_demographic_data/02_dynamic_boundaries/gudd_change_2000
 unzip ./01_data/02_auxiliary_data/03_mapping.zip -d ./01_data/02_auxiliary_data
 
 # launch Jupyter Lab
+# in VS Code, select the .venv interpreter or the "urban-demography-venv" kernel
 jupyter lab
 
 # example notebook:

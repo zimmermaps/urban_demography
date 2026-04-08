@@ -61,117 +61,29 @@ METRIC_COLUMNS = [
     "general_fr",
 ]
 
-DARK_COUNTRY_COLORS = [
-    "#1ee6ff",
-    "#45c7ff",
-    "#6f8dff",
-    "#a66bff",
-    "#00ffd4",
-    "#21f3ff",
-    "#5fd4ff",
-    "#8b7dff",
-    "#ff66e6",
-    "#3cf1ff",
-    "#58ffb1",
-    "#7fb2ff",
-    "#6dffea",
-    "#4fd6ff",
-    "#75b6ff",
-    "#a98bff",
-    "#ff78d0",
-    "#00ffc2",
-    "#34ffe7",
-    "#54c7ff",
-    "#7f9eff",
-    "#c77aff",
-    "#ff8aa5",
-    "#62ffe3",
-    "#4ee0ff",
-    "#7095ff",
-    "#9f7dff",
-    "#ff6ec7",
-    "#43ffd1",
-    "#68f0ff",
-    "#82b3ff",
-    "#b687ff",
-    "#ff7eb3",
-    "#53ffd9",
-    "#5ac9ff",
-    "#6fa8ff",
-    "#9480ff",
-    "#ff83df",
-    "#3cfdd2",
-    "#5de4ff",
-    "#7ca2ff",
-    "#ad73ff",
-    "#ff93c5",
-    "#4fffd6",
-    "#62d0ff",
-    "#88bbff",
-    "#c071ff",
-    "#ff82b7",
-    "#5dffe8",
-    "#6ed8ff",
-    "#96a4ff",
-    "#d16fff",
-    "#ff91d8",
-    "#66ffc8",
-    "#6ff2ff",
-    "#8cb8ff",
-    "#af8cff",
-    "#ff74cc",
+COUNTRY_RAMP_STOPS = [
+    "#34245d",
+    "#2d3f85",
+    "#225fa2",
+    "#14809f",
+    "#0f9d98",
+    "#84cfd2",
+    "#f2d8c8",
+    "#ffb277",
+    "#ff873d",
+    "#ff5a1f",
+    "#d72d2e",
+    "#7c1f72",
 ]
-
-LIGHT_COUNTRY_COLORS = [
-    "#9ee8ff",
-    "#b0e2ff",
-    "#c4d2ff",
-    "#dcc4ff",
-    "#aef8e6",
-    "#b7f3ff",
-    "#c6eaff",
-    "#d7d0ff",
-    "#ffc7f2",
-    "#c5f6ff",
-    "#baf7d8",
-    "#d5e4ff",
-    "#baf9ef",
-    "#b8ecff",
-    "#c3dcff",
-    "#dccfff",
-    "#ffd0ea",
-    "#b1ffe4",
-    "#bcfff3",
-    "#b9e8ff",
-    "#cbdbff",
-    "#e4ccff",
-    "#ffd7e1",
-    "#c8fff0",
-    "#bdf1ff",
-    "#c8d6ff",
-    "#dccdff",
-    "#ffd4f0",
-    "#beffe8",
-    "#c9f7ff",
-    "#d2e1ff",
-    "#e3d0ff",
-    "#ffd8e9",
-    "#c7ffef",
-    "#c4ebff",
-    "#cfe0ff",
-    "#ddd3ff",
-    "#ffd8f4",
-    "#c2ffe9",
-    "#c8f1ff",
-    "#d9e1ff",
-    "#e8ccff",
-    "#ffdeef",
-    "#cbffe5",
-    "#cdf9ff",
-    "#dbe7ff",
-    "#e6d8ff",
-    "#ffd5f1",
-]
+COUNTRY_PALETTE_SIZE = 72
+UNKNOWN_COUNTRY_KEYS = {"", "unknown", "none", "nan"}
+UNKNOWN_COUNTRY_DARK_FILL = "#7f8994"
+UNKNOWN_COUNTRY_LIGHT_FILL = "#cfd5dc"
+SPECIAL_COUNTRY_RAMP_POSITIONS = {
+    "china": 0.18,
+    "people's republic of china": 0.18,
+    "india": 0.78,
+}
 
 
 def normalize_city_id(value: str) -> str:
@@ -218,6 +130,10 @@ def stable_palette_index(text: str, palette_size: int) -> int:
     return value % palette_size
 
 
+def normalize_country_key(value: str | None) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
 def scale_hex(hex_color: str, factor: float) -> str:
     """Scale a hex color's RGB channels by factor (less than 1 darkens, greater than 1 brightens)."""
     color = hex_color.lstrip("#")
@@ -230,6 +146,79 @@ def scale_hex(hex_color: str, factor: float) -> str:
     g = max(0, min(255, int(round(g * factor))))
     b = max(0, min(255, int(round(b * factor))))
     return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def blend_hex(hex_a: str, hex_b: str, weight: float) -> str:
+    """Blend hex_a toward hex_b by weight in [0, 1]."""
+    color_a = hex_a.lstrip("#")
+    color_b = hex_b.lstrip("#")
+    if len(color_a) != 6 or len(color_b) != 6:
+        return hex_a
+    weight = max(0.0, min(1.0, weight))
+    r = int(round(int(color_a[0:2], 16) * (1 - weight) + int(color_b[0:2], 16) * weight))
+    g = int(round(int(color_a[2:4], 16) * (1 - weight) + int(color_b[2:4], 16) * weight))
+    b = int(round(int(color_a[4:6], 16) * (1 - weight) + int(color_b[4:6], 16) * weight))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def interpolate_hex(hex_a: str, hex_b: str, t: float) -> str:
+    return blend_hex(hex_a, hex_b, t)
+
+
+def sample_color_ramp(stops: list[str], position: float) -> str:
+    if not stops:
+        return "#888888"
+    if len(stops) == 1:
+        return stops[0]
+
+    safe_position = max(0.0, min(1.0, position))
+    scaled = safe_position * (len(stops) - 1)
+    lower_idx = int(math.floor(scaled))
+    upper_idx = min(len(stops) - 1, lower_idx + 1)
+    t = scaled - lower_idx
+    return interpolate_hex(stops[lower_idx], stops[upper_idx], t)
+
+
+def build_country_palettes(size: int) -> tuple[list[str], list[str]]:
+    dark_palette: list[str] = []
+    light_palette: list[str] = []
+    golden_ratio_conjugate = 0.6180339887498949
+
+    for idx in range(size):
+        position = (idx * golden_ratio_conjugate) % 1.0
+        dark_fill = sample_color_ramp(COUNTRY_RAMP_STOPS, position)
+        dark_palette.append(dark_fill)
+        light_palette.append(blend_hex(dark_fill, "#fff7ef", 0.46))
+
+    return dark_palette, light_palette
+
+
+def get_country_palette_colors(
+    country_name: str,
+    city_id: str,
+    dark_palette: list[str],
+    light_palette: list[str],
+) -> tuple[str, str, str, str]:
+    country_key = normalize_country_key(country_name)
+
+    if country_key in UNKNOWN_COUNTRY_KEYS:
+        dark_fill = UNKNOWN_COUNTRY_DARK_FILL
+        light_fill = UNKNOWN_COUNTRY_LIGHT_FILL
+    else:
+        special_position = SPECIAL_COUNTRY_RAMP_POSITIONS.get(country_key)
+        if special_position is not None:
+            dark_fill = sample_color_ramp(COUNTRY_RAMP_STOPS, special_position)
+            light_fill = blend_hex(dark_fill, "#fff7ef", 0.46)
+        else:
+            palette_key = country_name or city_id
+            dark_idx = stable_palette_index(palette_key, len(dark_palette))
+            light_idx = stable_palette_index(palette_key, len(light_palette))
+            dark_fill = dark_palette[dark_idx]
+            light_fill = light_palette[light_idx]
+
+    dark_outline = blend_hex(dark_fill, "#f4efff", 0.34)
+    light_outline = blend_hex(light_fill, "#2d3f53", 0.34)
+    return dark_fill, light_fill, dark_outline, light_outline
 
 
 def collect_city_metadata(metrics_csv: Path) -> tuple[list[str], dict[str, dict[str, float | str]]]:
@@ -348,6 +337,8 @@ def write_boundaries_geojson(
     output_geojson: Path,
     city_meta: dict[str, dict[str, float | str]],
 ) -> None:
+    dark_country_colors, light_country_colors = build_country_palettes(COUNTRY_PALETTE_SIZE)
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         raw_geojson = Path(tmp_dir) / "raw_boundaries.geojson"
         cmd = [
@@ -373,10 +364,12 @@ def write_boundaries_geojson(
 
         meta = city_meta.get(city_id, {})
         country_name = str(meta.get("country", "")).strip()
-        dark_idx = stable_palette_index(country_name or city_id, len(DARK_COUNTRY_COLORS))
-        light_idx = stable_palette_index(country_name or city_id, len(LIGHT_COUNTRY_COLORS))
-        dark_fill = DARK_COUNTRY_COLORS[dark_idx]
-        light_fill = LIGHT_COUNTRY_COLORS[light_idx]
+        dark_fill, light_fill, dark_outline, light_outline = get_country_palette_colors(
+            country_name,
+            city_id,
+            dark_country_colors,
+            light_country_colors,
+        )
         feature["properties"] = {
             "ID_UC_G0": city_id,
             "Name": meta.get("name", ""),
@@ -384,11 +377,11 @@ def write_boundaries_geojson(
             "Continent": meta.get("continent", ""),
             "Development": meta.get("development", ""),
             "CountryColor": dark_fill,
-            "CountryOutline": scale_hex(dark_fill, 1.26),
+            "CountryOutline": dark_outline,
             "CountryColorDark": dark_fill,
-            "CountryColorLight": dark_fill,
-            "CountryOutlineDark": scale_hex(dark_fill, 1.26),
-            "CountryOutlineLight": scale_hex(dark_fill, 1.26),
+            "CountryColorLight": light_fill,
+            "CountryOutlineDark": dark_outline,
+            "CountryOutlineLight": light_outline,
         }
         output_features.append(feature)
 

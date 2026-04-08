@@ -18,11 +18,15 @@ This folder contains:
 - Shows:
   - yearly snapshot metrics for that city,
   - a year slider + play animation control (2000-2020),
+  - a country-level population-versus-dependency plot for all cities in the selected city's country,
   - a dynamic population pyramid,
   - a trend plot of total population and total dependency ratio.
 - Includes:
   - dark/light Carto basemap toggle,
-  - download of full population-pyramid-through-time animation as GIF.
+  - download of the country context plot as GIF or PNG,
+  - download of full population-pyramid-through-time animation as GIF,
+  - download of the city trend plot as PNG,
+  - export-only watermarking for downloaded plots.
 
 ## Build web assets
 

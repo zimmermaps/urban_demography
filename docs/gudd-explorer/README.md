@@ -1,17 +1,17 @@
 # GUDD Explorer (GitHub Pages)
 
-This folder is the consolidated static site root for both web apps.
+This folder is the consolidated static site root for the published GUDD explorer.
 
 ## Structure
 
 - `docs/index.html`
   - Redirects to `docs/gudd-explorer/index.html`
 - `docs/gudd-explorer/index.html`
-  - Landing page with links to both apps
+  - Redirects directly to `docs/gudd-explorer/maps/index.html`
 - `docs/gudd-explorer/maps/`
   - Map app (`index.html`, `app.js`, `styles.css`, `data/`)
 - `docs/gudd-explorer/plots/`
-  - Plot app (`index.html`)
+  - Legacy standalone country plot app (`index.html`)
 
 ## What must be in GitHub Pages
 
@@ -32,4 +32,3 @@ as long as `maps/data/*` is already built.
 3. Copy/update outputs into `docs/gudd-explorer/maps/data/`.
 4. Commit and push.
 5. In GitHub settings, enable Pages from `main` branch, `/docs` folder.
-

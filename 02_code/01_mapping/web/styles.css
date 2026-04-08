@@ -1,4 +1,5 @@
 :root {
+  --sidebar-width: 500px;
   --paper: #f8f3e6;
   --ink: #1b2635;
   --accent: #0d8a84;
@@ -227,7 +228,7 @@ body.theme-dark {
   top: 0;
   bottom: 0;
   z-index: 5;
-  width: min(460px, 94vw);
+  width: clamp(360px, var(--sidebar-width), 94vw);
   transform: translateX(-100%);
   transition: transform 220ms ease;
   overflow-y: auto;
@@ -239,6 +240,35 @@ body.theme-dark {
 
 .sidebar.open {
   transform: translateX(0);
+}
+
+.sidebar.resizing {
+  transition: none;
+  user-select: none;
+}
+
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  bottom: 0;
+  width: 12px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.sidebar-resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 88px;
+  border-radius: 999px;
+  background: var(--meta-label);
+  opacity: 0.58;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .close-button {
@@ -356,6 +386,12 @@ body.theme-dark {
   gap: 8px;
 }
 
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .section-title-row .section-title {
   margin: 10px 0;
 }
@@ -394,6 +430,20 @@ body.theme-dark {
   border: 1px solid var(--plot-border);
   border-radius: 10px;
   background: var(--plot-bg);
+}
+
+#countryPlotFrame {
+  min-height: 0;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.country-plot-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  cursor: crosshair;
 }
 
 #pyramidPlot {
