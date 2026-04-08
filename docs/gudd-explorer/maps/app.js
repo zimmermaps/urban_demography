@@ -767,6 +767,19 @@ async function fetchPrimaryDataBundle() {
         continue;
       }
       state.dataDir = candidate;
+      if (!state.seriesPromise) {
+        state.seriesPromise = fetch(`${candidate}/city_series.bin`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch binary series from ${candidate}: HTTP ${response.status}`);
+            }
+            return response.arrayBuffer();
+          })
+          .then((buffer) => {
+            state.series = new Float32Array(buffer);
+            return state.series;
+          });
+      }
       const [cityIndex, boundaries] = await Promise.all([
         cityIndexResponse.json(),
         boundariesResponse.json(),
