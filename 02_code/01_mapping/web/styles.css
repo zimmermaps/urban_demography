@@ -166,6 +166,35 @@ body.theme-dark {
   line-height: 1.35;
 }
 
+.loading-steps {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  text-align: left;
+}
+
+.loading-step {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(157, 191, 226, 0.18);
+  background: rgba(157, 191, 226, 0.08);
+  font-size: 0.79rem;
+  line-height: 1.3;
+  opacity: 0.68;
+}
+
+.loading-step.is-active {
+  opacity: 1;
+  border-color: rgba(157, 191, 226, 0.4);
+  background: rgba(157, 191, 226, 0.16);
+}
+
+.loading-step.is-done {
+  opacity: 0.92;
+  border-color: rgba(100, 196, 165, 0.38);
+  background: rgba(100, 196, 165, 0.16);
+}
+
 #map {
   height: 100%;
   width: 100%;

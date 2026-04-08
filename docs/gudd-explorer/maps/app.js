@@ -125,6 +125,8 @@ const pyramidPlotEl = document.getElementById("pyramidPlot");
 const trendPlotEl = document.getElementById("trendPlot");
 const loadingOverlayEl = document.getElementById("loadingOverlay");
 const loadingMessageEl = document.getElementById("loadingMessage");
+const loadingStepMapEl = document.getElementById("loadingStepMap");
+const loadingStepVisualsEl = document.getElementById("loadingStepVisuals");
 
 init().catch((error) => {
   const message = error && error.message ? error.message : String(error);
@@ -148,10 +150,10 @@ async function init() {
   setControlsEnabled(false);
   renderEmptyCountryPlot();
 
-  setStartupLoadingMessage("Loading basemap...");
+  setStartupLoadingPhase("map", "Loading basemap...");
   const mapReadyPromise = initMap();
 
-  setStartupLoadingMessage("Loading city boundaries and metadata...");
+  setStartupLoadingPhase("map", "Loading city boundaries and metadata...");
   const dataBundlePromise = fetchPrimaryDataBundle();
   const [dataBundle] = await Promise.all([dataBundlePromise, mapReadyPromise]);
   const { cityIndex, boundaries } = dataBundle;
@@ -174,10 +176,14 @@ async function init() {
     }
   }
 
-  setStartupLoadingMessage("Rendering map polygons...");
+  setStartupLoadingPhase("map", "Rendering map polygons...");
   addCityLayers(boundaries);
   applyBasemapTheme();
   updateBasemapToggleButton();
+
+  setStartupLoadingPhase("visuals", "Preloading visualizations...");
+  await ensureSeriesLoaded();
+
   hideStartupLoading();
   statusTextEl.textContent = "Map ready. Click a city polygon.";
   queueGifSupportPreload();
@@ -602,7 +608,19 @@ function setStartupLoadingMessage(message) {
   statusTextEl.textContent = message;
 }
 
+function setStartupLoadingPhase(phase, message) {
+  setStartupLoadingMessage(message);
+  setStartupStepState(loadingStepMapEl, phase === "map" ? "active" : "done");
+  if (phase === "visuals") {
+    setStartupStepState(loadingStepVisualsEl, "active");
+  } else {
+    setStartupStepState(loadingStepVisualsEl, "pending");
+  }
+}
+
 function hideStartupLoading() {
+  setStartupStepState(loadingStepMapEl, "done");
+  setStartupStepState(loadingStepVisualsEl, "done");
   if (loadingOverlayEl) {
     loadingOverlayEl.classList.add("hidden");
     loadingOverlayEl.classList.remove("error");
@@ -610,6 +628,8 @@ function hideStartupLoading() {
 }
 
 function showStartupError(message) {
+  setStartupStepState(loadingStepMapEl, "pending");
+  setStartupStepState(loadingStepVisualsEl, "pending");
   if (loadingMessageEl) {
     loadingMessageEl.textContent = message;
   }
@@ -618,6 +638,18 @@ function showStartupError(message) {
     loadingOverlayEl.classList.add("error");
   }
   statusTextEl.textContent = message;
+}
+
+function setStartupStepState(stepEl, stateValue) {
+  if (!stepEl) {
+    return;
+  }
+  stepEl.classList.remove("is-active", "is-done");
+  if (stateValue === "active") {
+    stepEl.classList.add("is-active");
+  } else if (stateValue === "done") {
+    stepEl.classList.add("is-done");
+  }
 }
 
 async function prepareGifSupport() {
