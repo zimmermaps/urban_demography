@@ -94,6 +94,7 @@ const state = {
   dataDir: null,
   basemapTheme: "dark",
   gifReady: false,
+  gifSupportQueued: false,
   sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
   sidebarResizeFrame: null,
   countryPlotMouse: {
@@ -122,10 +123,12 @@ const countryPlotCanvasEl = document.getElementById("countryPlotCanvas");
 const countryPlotCtx = countryPlotCanvasEl.getContext("2d");
 const pyramidPlotEl = document.getElementById("pyramidPlot");
 const trendPlotEl = document.getElementById("trendPlot");
+const loadingOverlayEl = document.getElementById("loadingOverlay");
+const loadingMessageEl = document.getElementById("loadingMessage");
 
 init().catch((error) => {
   const message = error && error.message ? error.message : String(error);
-  statusTextEl.textContent = `Failed to initialize map app: ${message}`;
+  showStartupError(`Failed to initialize map app: ${message}`);
   // eslint-disable-next-line no-console
   console.error(error);
 });
@@ -138,8 +141,20 @@ async function init() {
     throw new Error("Plotly script failed to load (check internet/CDN access).");
   }
 
-  const cityIndex = await fetchCityIndex();
-  const boundaries = await fetchBoundaries();
+  bindUiEvents();
+  applySidebarWidth(getDefaultSidebarWidth());
+  initSidebarResizing();
+  observeSidebarResize();
+  setControlsEnabled(false);
+  renderEmptyCountryPlot();
+
+  setStartupLoadingMessage("Loading basemap...");
+  const mapReadyPromise = initMap();
+
+  setStartupLoadingMessage("Loading city boundaries and metadata...");
+  const dataBundlePromise = fetchPrimaryDataBundle();
+  const [dataBundle] = await Promise.all([dataBundlePromise, mapReadyPromise]);
+  const { cityIndex, boundaries } = dataBundle;
 
   state.years = cityIndex.years;
   state.ageColumns = cityIndex.age_columns;
@@ -159,14 +174,13 @@ async function init() {
     }
   }
 
-  initMap(boundaries);
-  bindUiEvents();
-  applySidebarWidth(getDefaultSidebarWidth());
-  initSidebarResizing();
-  observeSidebarResize();
-  setControlsEnabled(false);
-  renderEmptyCountryPlot();
-  prepareGifSupport();
+  setStartupLoadingMessage("Rendering map polygons...");
+  addCityLayers(boundaries);
+  applyBasemapTheme();
+  updateBasemapToggleButton();
+  hideStartupLoading();
+  statusTextEl.textContent = "Map ready. Click a city polygon.";
+  queueGifSupportPreload();
 }
 
 function bindUiEvents() {
@@ -353,7 +367,7 @@ function scheduleSidebarPlotResize() {
   });
 }
 
-function initMap(boundaries) {
+function initMap() {
   state.map = new maplibregl.Map({
     container: "map",
     style: createMapStyle(state.basemapTheme),
@@ -365,11 +379,10 @@ function initMap(boundaries) {
 
   state.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
-  state.map.on("load", () => {
-    addCityLayers(boundaries);
-    applyBasemapTheme();
-    updateBasemapToggleButton();
-    statusTextEl.textContent = "Map ready. Click a city polygon.";
+  return new Promise((resolve) => {
+    state.map.once("load", () => {
+      resolve();
+    });
   });
 }
 
@@ -506,6 +519,7 @@ function addCityLayers(boundaries) {
     state.countryPlotMouse = { active: false, x: -1, y: -1 };
     sidebarEl.classList.add("open");
     setControlsEnabled(true);
+    queueGifSupportPreload();
     updateMapSelection();
     renderCityHeader();
     statusTextEl.textContent = "Loading city time series...";
@@ -578,6 +592,34 @@ function setControlsEnabled(enabled) {
   downloadTrendPngButtonEl.disabled = !enabled;
 }
 
+function setStartupLoadingMessage(message) {
+  if (loadingMessageEl) {
+    loadingMessageEl.textContent = message;
+  }
+  if (loadingOverlayEl) {
+    loadingOverlayEl.classList.remove("hidden", "error");
+  }
+  statusTextEl.textContent = message;
+}
+
+function hideStartupLoading() {
+  if (loadingOverlayEl) {
+    loadingOverlayEl.classList.add("hidden");
+    loadingOverlayEl.classList.remove("error");
+  }
+}
+
+function showStartupError(message) {
+  if (loadingMessageEl) {
+    loadingMessageEl.textContent = message;
+  }
+  if (loadingOverlayEl) {
+    loadingOverlayEl.classList.remove("hidden");
+    loadingOverlayEl.classList.add("error");
+  }
+  statusTextEl.textContent = message;
+}
+
 async function prepareGifSupport() {
   try {
     await ensureGifshotLoaded();
@@ -593,6 +635,28 @@ async function prepareGifSupport() {
   } finally {
     setControlsEnabled(Boolean(state.selectedCity));
   }
+}
+
+function queueGifSupportPreload() {
+  if (state.gifReady || state.gifSupportQueued) {
+    return;
+  }
+  state.gifSupportQueued = true;
+
+  const preload = () => {
+    window.setTimeout(() => {
+      prepareGifSupport().finally(() => {
+        state.gifSupportQueued = false;
+      });
+    }, 1200);
+  };
+
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(preload, { timeout: 2000 });
+    return;
+  }
+
+  preload();
 }
 
 async function ensureGifshotLoaded() {
@@ -660,31 +724,27 @@ function updateMapSelection() {
   state.map.setFilter("city-selected", ["==", ["get", "ID_UC_G0"], selectedId]);
 }
 
-async function fetchCityIndex() {
+async function fetchPrimaryDataBundle() {
   for (const candidate of DATA_DIR_CANDIDATES) {
     try {
-      const response = await fetch(`${candidate}/city_index.json`);
-      if (!response.ok) {
+      const [cityIndexResponse, boundariesResponse] = await Promise.all([
+        fetch(`${candidate}/city_index.json`),
+        fetch(`${candidate}/static_boundaries.geojson`),
+      ]);
+      if (!cityIndexResponse.ok || !boundariesResponse.ok) {
         continue;
       }
       state.dataDir = candidate;
-      return response.json();
+      const [cityIndex, boundaries] = await Promise.all([
+        cityIndexResponse.json(),
+        boundariesResponse.json(),
+      ]);
+      return { cityIndex, boundaries };
     } catch (_) {
       // keep trying candidate paths
     }
   }
-  throw new Error("Could not find city_index.json in expected data paths.");
-}
-
-async function fetchBoundaries() {
-  if (!state.dataDir) {
-    throw new Error("Data directory not resolved before loading boundaries.");
-  }
-  const response = await fetch(`${state.dataDir}/static_boundaries.geojson`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch boundaries from ${state.dataDir}: HTTP ${response.status}`);
-  }
-  return response.json();
+  throw new Error("Could not find the required map data in expected data paths.");
 }
 
 async function ensureSeriesLoaded() {

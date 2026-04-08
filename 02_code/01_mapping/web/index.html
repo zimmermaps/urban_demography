@@ -107,6 +107,13 @@
     </section>
 
     <section class="map-shell">
+      <div id="loadingOverlay" class="loading-overlay" aria-live="polite">
+        <div class="loading-card">
+          <div class="loading-spinner" aria-hidden="true"></div>
+          <p class="loading-kicker">Preparing Map</p>
+          <p id="loadingMessage" class="loading-message">Loading basemap...</p>
+        </div>
+      </div>
       <div class="top-ribbon">
         <div class="title-block">
           <h2>Global Urban Demographic Dataset (GUDD) Explorer</h2>
@@ -137,7 +144,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.4.0/dist/maplibre-gl.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>
