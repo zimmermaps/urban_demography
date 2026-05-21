@@ -1,72 +1,55 @@
-# ==========================
 # Python virtual environments
-# ==========================
 .venv/
-env/
 venv/
-.venv*
-# ==========================
-# Jupyter and Python cache
-# ==========================
-.ipynb_checkpoints/
-**/.ipynb_checkpoints/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+env/
 
-# ==========================
+# Jupyter and Python cache
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
 # System files
-# ==========================
 .DS_Store
 Thumbs.db
+
+# Editor and IDE settings
 .vscode/
 
-# ==========================
-# Temporary or log files
-# ==========================
+# Temporary files and logs
 *.log
 *.tmp
 *.bak
 
-# ==========================
 # Python packaging artifacts
-# ==========================
 *.egg-info/
 build/
 dist/
 
-# ==========================
-# Editor and IDE folders
-# ==========================
-.vscode/
-
-# ==========================
-# Project-specific folders to ignore
-# ==========================
-# Data that is archived and not needed for reproducibility
+# Archived project outputs
 01_data/archived_data/
-
-# Old code or archived scripts
 02_code/archived_code/
-
-# Archived figures or old documents
 03_documents/archived_figures/
 
-# Raw/large data
+# Raw and large data
 01_data/01_urban_agesex_output/
 01_data/02_auxiliary_data/01_niva_deathrate/
 01_data/02_auxiliary_data/02_wb_deathrate/
 01_data/02_auxiliary_data/03_mapping/
 01_data/03_ghs_ucdb/
+01_data/05_dataverse_data/
 
-# make sure to include the zip folders
+# Keep zipped release data trackable; ignore expanded/generated local copies.
 01_data/04_final_demographic_data/**/*.csv
-01_data/*.zip
-01_data/04_final_demographic_data.zip
+01_data/04_final_demographic_data/**/*.geoparquet
 
-# ignore submission documents for now
-04_submission_documents/
-
-# ignore new data
+# Generated or local-only notebooks and helper scripts
+02_code/08_cover_art_test.ipynb
+02_code/10_query_dataset.ipynb
 02_code/01_data_download/
+02_code/build_boundary_lookup_geoparquets.py
+
+# Submission, cover art, and manuscript build artifacts
+03_documents/03_other_figures/cover_art/
+03_documents/04_submission_documents/
+03_documents/05_ncities_documents/
+03_documents/06_latex_documents/
