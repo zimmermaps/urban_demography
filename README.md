@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ---
 
-<img src="03_documents/03_other_figures/fig4_slice.png" alt="Urban Density Map" width="800">  
+<img src="03_documents/03_other_figures/fig4a_slice.png" alt="Urban Density Map" width="800">  
 
 ---
 ## Overview
