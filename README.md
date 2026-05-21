@@ -7,9 +7,21 @@
 ---
 ## Overview
 
-This repository accompanies the manuscript and provides access to the code and data for globally consistent, city-level estimates of urban demographic structure, natural change, and migration for > 10,000 cities from 2000–2020 using both static and dynamically evolving urban boundaries.
+This repository accompanies the manuscript *Global Divergence in Urban Demographic Change and Migration Patterns*. It provides code and links to data for globally consistent, city-level estimates of urban demographic structure, natural change, and migration for more than 10,000 cities from 2000–2020. The analysis uses both static and dynamically evolving urban boundaries to assess how urban demographic change varies across cities and regions.
 
-Explore the data and visualizations here: [GUDD Explorer](https://zimmermaps.github.io/urban_demography/).
+[Explore the interactive data visualization](https://zimmermaps.github.io/urban_demography/)
+
+## Paper
+
+Zimmer, A., Brooks, N., Gaughan, A. E., Tuholske, C. (2026). Global Divergence in Urban Demographic Change and Migration Patterns. *Nature Cities*. [View Here](https://doi.org/10.1038/s44284-026-00447-7)
+
+## Dataset
+
+Zimmer, A., Brooks, N., Gaughan, A. E., Giezendanner, J., Tuholske, C. (2026). *Global Urban Demographic Dataset (GUDD), version 1*. Harvard Dataverse. [View Here](https://doi.org/10.7910/DVN/GMV8WG)
+
+## Code
+
+Zimmer, A., Brooks, N., Gaughan, A. E., Giezendanner, J., Tuholske, C. (2026). *Global Divergence in Urban Demographic Change and Migration Patterns*, version 1.0.0. GitHub. [View Here](https://github.com/zimmermaps/urban_demography)
 
 ### Change in Urban Dependency Ratio Between 2000-2020
 

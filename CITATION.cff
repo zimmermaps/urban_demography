@@ -6,6 +6,19 @@ title: "Global Divergence in Urban Demographic Change and Migration Patterns"
 authors:
   - family-names: Zimmer
     given-names: Andrew
+    orcid: "https://orcid.org/0000-0001-7683-8713"
+  - family-names: Brooks
+    given-names: Nina
+    orcid: "https://orcid.org/0000-0003-3409-5434"
+  - family-names: Gaughan
+    given-names: Andrea
+    orcid: "https://orcid.org/0000-0002-4898-1587"
+  - family-names: Giezendanner
+    given-names: Jonathan
+    orcid: "https://orcid.org/0000-0001-8809-8513"
+  - family-names: Tuholske
+    given-names: Cascade
+    orcid: "https://orcid.org/0000-0002-4806-0462"
 
 repository-code: "https://github.com/zimmermaps/urban_demography"
 url: "https://github.com/zimmermaps/urban_demography"
