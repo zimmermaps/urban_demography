@@ -22,7 +22,7 @@ This folder contains:
   - a dynamic population pyramid,
   - a trend plot of total population and total dependency ratio.
 - Includes:
-  - dark/light Carto basemap toggle,
+  - dark/light OpenFreeMap basemap toggle (no API key required),
   - download of the country context plot as GIF or PNG,
   - download of full population-pyramid-through-time animation as GIF,
   - download of the city trend plot as PNG,

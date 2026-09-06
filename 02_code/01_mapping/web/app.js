@@ -60,19 +60,9 @@ const METRIC_CARD_CONFIG = [
   { key: "general_fr", label: "General Fertility Rate", formatter: (v) => formatDecimal(v, 2) },
 ];
 
-const MAP_TILES = {
-  light: [
-    "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-    "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-    "https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-    "https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-  ],
-  dark: [
-    "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-    "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-    "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-    "https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-  ],
+const BASEMAP_STYLES = {
+  light: "https://tiles.openfreemap.org/styles/positron",
+  dark: "https://tiles.openfreemap.org/styles/dark",
 };
 
 const state = {
@@ -92,7 +82,9 @@ const state = {
   selectedYearIdx: 0,
   animationTimer: null,
   dataDir: null,
+  boundaries: null,
   basemapTheme: "dark",
+  basemapSwitching: false,
   gifReady: false,
   gifSupportQueued: false,
   sidebarWidth: SIDEBAR_DEFAULT_WIDTH,
@@ -157,6 +149,7 @@ async function init() {
   const dataBundlePromise = fetchPrimaryDataBundle();
   const [dataBundle] = await Promise.all([dataBundlePromise, mapReadyPromise]);
   const { cityIndex, boundaries } = dataBundle;
+  state.boundaries = boundaries;
 
   state.years = cityIndex.years;
   state.ageColumns = cityIndex.age_columns;
@@ -239,12 +232,10 @@ function bindUiEvents() {
   });
 
   basemapToggleButtonEl.addEventListener("click", () => {
-    if (!state.map) {
+    if (!state.map || state.basemapSwitching) {
       return;
     }
-    state.basemapTheme = state.basemapTheme === "dark" ? "light" : "dark";
-    applyBasemapTheme();
-    updateBasemapToggleButton();
+    switchBasemapTheme(state.basemapTheme === "dark" ? "light" : "dark");
   });
 
   countryPlotCanvasEl.addEventListener("mousemove", (event) => {
@@ -376,7 +367,7 @@ function scheduleSidebarPlotResize() {
 function initMap() {
   state.map = new maplibregl.Map({
     container: "map",
-    style: createMapStyle(state.basemapTheme),
+    style: BASEMAP_STYLES[state.basemapTheme],
     center: [12, 20],
     zoom: 1.6,
     minZoom: 1.2,
@@ -392,42 +383,6 @@ function initMap() {
   });
 }
 
-function createMapStyle(theme) {
-  const showDark = theme === "dark";
-  return {
-    version: 8,
-    glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
-    sources: {
-      carto_light: {
-        type: "raster",
-        tiles: MAP_TILES.light,
-        tileSize: 256,
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-      },
-      carto_dark: {
-        type: "raster",
-        tiles: MAP_TILES.dark,
-        tileSize: 256,
-        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
-      },
-    },
-    layers: [
-      {
-        id: "basemap-light",
-        type: "raster",
-        source: "carto_light",
-        layout: { visibility: showDark ? "none" : "visible" },
-      },
-      {
-        id: "basemap-dark",
-        type: "raster",
-        source: "carto_dark",
-        layout: { visibility: showDark ? "visible" : "none" },
-      },
-    ],
-  };
-}
-
 function getCountryFillProperty() {
   return state.basemapTheme === "dark" ? "CountryColorDark" : "CountryColorLight";
 }
@@ -441,6 +396,10 @@ function getCountryFillOpacity() {
 }
 
 function addCityLayers(boundaries) {
+  if (!state.map || !boundaries || state.map.getSource("cities")) {
+    return;
+  }
+
   state.map.addSource("cities", {
     type: "geojson",
     data: boundaries,
@@ -488,7 +447,7 @@ function addCityLayers(boundaries) {
     minzoom: 3.6,
     layout: {
       "text-field": ["get", "Name"],
-      "text-font": ["IBM Plex Mono Regular", "Noto Sans Mono Regular", "Open Sans Regular"],
+      "text-font": ["Noto Sans Regular"],
       "text-size": ["interpolate", ["linear"], ["zoom"], 3.6, 8.5, 6, 10.3, 8, 12.2],
       "text-max-width": 9,
     },
@@ -499,61 +458,120 @@ function addCityLayers(boundaries) {
     },
   });
 
-  state.map.on("mouseenter", "city-fill", () => {
-    state.map.getCanvas().style.cursor = "pointer";
-  });
+  bindCityLayerEvents();
+}
 
-  state.map.on("mouseleave", "city-fill", () => {
-    state.map.getCanvas().style.cursor = "";
-  });
+function bindCityLayerEvents() {
+  state.map.off("mouseenter", "city-fill", handleCityMouseEnter);
+  state.map.off("mouseleave", "city-fill", handleCityMouseLeave);
+  state.map.off("click", "city-fill", handleCityClick);
+  state.map.on("mouseenter", "city-fill", handleCityMouseEnter);
+  state.map.on("mouseleave", "city-fill", handleCityMouseLeave);
+  state.map.on("click", "city-fill", handleCityClick);
+}
 
-  state.map.on("click", "city-fill", async (event) => {
-    const feature = event.features && event.features[0];
-    if (!feature) {
+function handleCityMouseEnter() {
+  state.map.getCanvas().style.cursor = "pointer";
+}
+
+function handleCityMouseLeave() {
+  state.map.getCanvas().style.cursor = "";
+}
+
+async function handleCityClick(event) {
+  const feature = event.features && event.features[0];
+  if (!feature) {
+    return;
+  }
+
+  const cityId = normalizeCityId(feature.properties.ID_UC_G0);
+  const city = state.cityById.get(cityId);
+  if (!city) {
+    statusTextEl.textContent = `No city series found for ID ${cityId}.`;
+    return;
+  }
+
+  state.selectedCity = city;
+  state.selectedYearIdx = state.years.length - 1;
+  state.countryPlotMouse = { active: false, x: -1, y: -1 };
+  sidebarEl.classList.add("open");
+  setControlsEnabled(true);
+  queueGifSupportPreload();
+  updateMapSelection();
+  renderCityHeader();
+  statusTextEl.textContent = "Loading city time series...";
+
+  try {
+    await ensureSeriesLoaded();
+    getCityAxisLimits(city);
+    statusTextEl.textContent = `Selected ${city.name || "Unknown City"} (${city.country || "Unknown Country"})`;
+    renderSelectedCity();
+  } catch (error) {
+    statusTextEl.textContent = "Failed to load city time series binary.";
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+}
+
+function switchBasemapTheme(nextTheme) {
+  if (!state.map || state.basemapSwitching || !BASEMAP_STYLES[nextTheme]) {
+    return;
+  }
+
+  const previousTheme = state.basemapTheme;
+  state.basemapTheme = nextTheme;
+  state.basemapSwitching = true;
+  basemapToggleButtonEl.disabled = true;
+  applyBasemapTheme();
+  updateBasemapToggleButton();
+  statusTextEl.textContent = `Loading ${nextTheme} basemap...`;
+
+  const timeoutId = window.setTimeout(() => {
+    if (state.basemapSwitching && state.basemapTheme === nextTheme) {
+      state.basemapSwitching = false;
+      basemapToggleButtonEl.disabled = false;
+      statusTextEl.textContent = "Basemap switch is taking longer than expected.";
+    }
+  }, 15000);
+
+  state.map.once("style.load", () => {
+    if (state.basemapTheme !== nextTheme) {
       return;
     }
-
-    const cityId = normalizeCityId(feature.properties.ID_UC_G0);
-    const city = state.cityById.get(cityId);
-    if (!city) {
-      statusTextEl.textContent = `No city series found for ID ${cityId}.`;
-      return;
-    }
-
-    state.selectedCity = city;
-    state.selectedYearIdx = state.years.length - 1;
-    state.countryPlotMouse = { active: false, x: -1, y: -1 };
-    sidebarEl.classList.add("open");
-    setControlsEnabled(true);
-    queueGifSupportPreload();
+    window.clearTimeout(timeoutId);
+    addCityLayers(state.boundaries);
+    applyBasemapTheme();
     updateMapSelection();
-    renderCityHeader();
-    statusTextEl.textContent = "Loading city time series...";
-
-    try {
-      await ensureSeriesLoaded();
-      getCityAxisLimits(city);
-      statusTextEl.textContent = `Selected ${city.name || "Unknown City"} (${city.country || "Unknown Country"})`;
-      renderSelectedCity();
-    } catch (error) {
-      statusTextEl.textContent = "Failed to load city time series binary.";
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
+    state.basemapSwitching = false;
+    basemapToggleButtonEl.disabled = false;
+    statusTextEl.textContent = state.selectedCity
+      ? `Selected ${state.selectedCity.name || "Unknown City"} (${state.selectedCity.country || "Unknown Country"})`
+      : "Map ready. Click a city polygon.";
   });
+
+  try {
+    state.map.setStyle(BASEMAP_STYLES[nextTheme]);
+  } catch (error) {
+    window.clearTimeout(timeoutId);
+    state.basemapTheme = previousTheme;
+    state.basemapSwitching = false;
+    basemapToggleButtonEl.disabled = false;
+    applyBasemapTheme();
+    updateBasemapToggleButton();
+    statusTextEl.textContent = "Unable to switch basemaps.";
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
 }
 
 function applyBasemapTheme() {
-  if (!state.map || !state.map.getLayer("basemap-dark")) {
+  if (!state.map) {
     return;
   }
 
   const isDark = state.basemapTheme === "dark";
   document.body.classList.toggle("theme-dark", isDark);
   document.body.classList.toggle("theme-light", !isDark);
-
-  state.map.setLayoutProperty("basemap-dark", "visibility", isDark ? "visible" : "none");
-  state.map.setLayoutProperty("basemap-light", "visibility", isDark ? "none" : "visible");
 
   if (state.map.getLayer("city-fill")) {
     state.map.setPaintProperty("city-fill", "fill-color", ["get", getCountryFillProperty()]);
