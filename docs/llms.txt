@@ -1,0 +1,46 @@
+# Global Urban Demographic Dataset (GUDD) Explorer
+
+> An interactive, open-access map and chart explorer for annual city-level population, age–sex structure, demographic rates, natural change, and migration worldwide from 2000 to 2020.
+
+Canonical explorer: https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/
+
+## What the explorer contains
+
+- Geographic coverage: more than 10,000 cities worldwide.
+- Temporal coverage: annual estimates from 2000 through 2020.
+- Map views: metric snapshots, absolute or percentage change over custom years, and the contributions of natural change and migration to population growth.
+- City views: a current-year country comparison scatter plot, population pyramid, population and dependency time series, and snapshot metrics.
+- Metrics: total population, total dependency ratio, youth dependency ratio, old-age dependency ratio, sex ratio, women of childbearing age, general fertility rate, births, deaths, natural change, and migration.
+- Downloads: direct Harvard Dataverse files for static and dynamically evolving city boundaries, plus dataset documentation.
+
+## Primary sources and citations
+
+Paper:
+Zimmer, A., Brooks, N., Gaughan, A. E., & Tuholske, C. (2026). Global divergence in urban demographic change and migration patterns. Nature Cities, 3, 599–607. https://doi.org/10.1038/s44284-026-00447-7
+
+Research Briefing:
+A clearer picture of who lives in the world’s cities. (2026). Nature Cities, 3, 580–581. https://doi.org/10.1038/s44284-026-00469-1
+
+Dataset:
+Zimmer, A., Brooks, N., Gaughan, A. E., Giezendanner, J., & Tuholske, C. (2026). Global Urban Demographic Dataset (GUDD), version 1 [Data set]. Harvard Dataverse. https://doi.org/10.7910/DVN/GMV8WG
+
+Software:
+Zimmer, A., Brooks, N., Gaughan, A. E., Giezendanner, J., & Tuholske, C. (2026). Global divergence in urban demographic change and migration patterns (Version 1.0.0) [Computer software]. GitHub. https://github.com/zimmermaps/urban_demography
+
+## Links
+
+- Explorer: https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/
+- Paper: https://doi.org/10.1038/s44284-026-00447-7
+- Free Research Briefing: https://rdcu.be/fnwNx
+- Dataset record and documentation: https://doi.org/10.7910/DVN/GMV8WG
+- Source code: https://github.com/zimmermaps/urban_demography
+- License: https://github.com/zimmermaps/urban_demography/blob/main/LICENSE
+
+## Author identity
+
+- Andrew Zimmer: https://www.linkedin.com/in/andrewzimmer1/
+- ORCID: https://orcid.org/0000-0001-7683-8713
+
+## Data-access notes
+
+The explorer is a static, client-side web application. Its initial map uses a compact 2020 snapshot; historical metrics load after first paint, detailed boundaries load after users zoom in, and age–sex data are requested by byte range for the selected city. Complete data, metadata, documentation, and boundary variants are available from the Harvard Dataverse record.

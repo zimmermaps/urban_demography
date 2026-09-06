@@ -13,6 +13,7 @@ from array import array
 from pathlib import Path
 
 YEARS = list(range(2000, 2021))
+SNAPSHOT_YEAR = 2020
 AGE_COLUMNS = [
     "f_00",
     "f_01",
@@ -59,6 +60,11 @@ METRIC_COLUMNS = [
     "total_sr",
     "women_cba",
     "general_fr",
+    "pop_change",
+    "natural_change",
+    "migration",
+    "births",
+    "deaths_total",
 ]
 
 COUNTRY_RAMP_STOPS = [
@@ -243,8 +249,13 @@ def collect_city_metadata(metrics_csv: Path) -> tuple[list[str], dict[str, dict[
             }
 
             existing = city_meta.get(city_id)
-            if existing is None or year == 2020:
+            if existing is None:
                 city_meta[city_id] = row_meta
+            elif year == 2020:
+                # Prefer 2020 metadata without replacing usable earlier values with blanks.
+                for key, value in row_meta.items():
+                    if value not in (None, ""):
+                        existing[key] = value
 
     sorted_ids = sorted(city_ids, key=lambda value: int(value))
     return sorted_ids, city_meta
@@ -254,13 +265,15 @@ def build_city_series(
     all_csv: Path,
     metrics_csv: Path,
     city_ids: list[str],
-) -> tuple[array, dict[str, int], int, int]:
+) -> tuple[array, array, dict[str, int], int, int]:
     n_years = len(YEARS)
-    values_per_year = len(AGE_COLUMNS) + len(METRIC_COLUMNS)
-    city_block_size = n_years * values_per_year
-    total_values = len(city_ids) * city_block_size
+    metric_values_per_year = len(METRIC_COLUMNS)
+    age_values_per_year = len(AGE_COLUMNS)
+    metric_city_block_size = n_years * metric_values_per_year
+    age_city_block_size = n_years * age_values_per_year
 
-    series = array("f", [math.nan]) * total_values
+    metric_series = array("f", [math.nan]) * (len(city_ids) * metric_city_block_size)
+    age_series = array("f", [math.nan]) * (len(city_ids) * age_city_block_size)
     city_to_idx = {city_id: idx for idx, city_id in enumerate(city_ids)}
     year_to_idx = {year: idx for idx, year in enumerate(YEARS)}
 
@@ -274,9 +287,9 @@ def build_city_series(
             if city_idx is None or year_idx is None:
                 continue
 
-            row_offset = city_idx * city_block_size + year_idx * values_per_year + len(AGE_COLUMNS)
+            row_offset = city_idx * metric_city_block_size + year_idx * metric_values_per_year
             for metric_idx, metric_name in enumerate(METRIC_COLUMNS):
-                series[row_offset + metric_idx] = parse_float(row.get(metric_name, ""))
+                metric_series[row_offset + metric_idx] = parse_float(row.get(metric_name, ""))
 
     with all_csv.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
@@ -288,11 +301,28 @@ def build_city_series(
             if city_idx is None or year_idx is None:
                 continue
 
-            row_offset = city_idx * city_block_size + year_idx * values_per_year
+            row_offset = city_idx * age_city_block_size + year_idx * age_values_per_year
             for age_idx, age_name in enumerate(AGE_COLUMNS):
-                series[row_offset + age_idx] = parse_float(row.get(age_name, ""))
+                age_series[row_offset + age_idx] = parse_float(row.get(age_name, ""))
 
-    return series, city_to_idx, values_per_year, city_block_size
+    return metric_series, age_series, city_to_idx, metric_city_block_size, age_city_block_size
+
+
+def build_snapshot_series(
+    metric_series: array,
+    city_ids: list[str],
+    metric_city_block_size: int,
+) -> array:
+    """Extract one compact, city-major metric block for the initial map view."""
+    snapshot_year_idx = YEARS.index(SNAPSHOT_YEAR)
+    values_per_city = len(METRIC_COLUMNS)
+    snapshot_series = array("f")
+
+    for city_idx in range(len(city_ids)):
+        start = city_idx * metric_city_block_size + snapshot_year_idx * values_per_city
+        snapshot_series.extend(metric_series[start : start + values_per_city])
+
+    return snapshot_series
 
 
 def write_city_index(
@@ -300,8 +330,8 @@ def write_city_index(
     city_ids: list[str],
     city_meta: dict[str, dict[str, float | str]],
     city_to_idx: dict[str, int],
-    city_block_size: int,
-    values_per_year: int,
+    metric_city_block_size: int,
+    age_city_block_size: int,
 ) -> None:
     cities: list[dict[str, str | float | int | None]] = []
     for city_id in city_ids:
@@ -316,15 +346,18 @@ def write_city_index(
                 "development": meta.get("development", ""),
                 "latitude": finite_or_none(meta.get("latitude", None)),
                 "longitude": finite_or_none(meta.get("longitude", None)),
-                "series_index": city_idx * city_block_size,
+                "metric_series_index": city_idx * metric_city_block_size,
+                "age_series_index": city_idx * age_city_block_size,
             }
         )
 
     payload = {
         "years": YEARS,
+        "snapshot_year": SNAPSHOT_YEAR,
         "age_columns": AGE_COLUMNS,
         "metric_columns": METRIC_COLUMNS,
-        "values_per_year": values_per_year,
+        "metric_values_per_year": len(METRIC_COLUMNS),
+        "age_values_per_year": len(AGE_COLUMNS),
         "cities": cities,
     }
 
@@ -390,38 +423,100 @@ def write_boundaries_geojson(
         json.dump(geojson, handle, separators=(",", ":"))
 
 
-def build_assets(all_csv: Path, metrics_csv: Path, boundaries_shp: Path, output_dir: Path) -> None:
+def iter_coordinate_pairs(coordinates: object):
+    if not isinstance(coordinates, list) or not coordinates:
+        return
+    if len(coordinates) >= 2 and all(isinstance(value, (int, float)) for value in coordinates[:2]):
+        yield float(coordinates[0]), float(coordinates[1])
+        return
+    for item in coordinates:
+        yield from iter_coordinate_pairs(item)
+
+
+def backfill_city_coordinates(boundaries_geojson: Path, city_meta: dict[str, dict[str, float | str]]) -> None:
+    """Use boundary bounding-box centers when the annual table has no point coordinates."""
+    if not boundaries_geojson.exists():
+        return
+
+    with boundaries_geojson.open(encoding="utf-8") as handle:
+        geojson = json.load(handle)
+
+    for feature in geojson.get("features", []):
+        properties = feature.get("properties", {})
+        city_id = normalize_city_id(properties.get("ID_UC_G0", ""))
+        meta = city_meta.get(city_id)
+        if not meta or (meta.get("longitude") is not None and meta.get("latitude") is not None):
+            continue
+
+        coordinate_pairs = list(iter_coordinate_pairs(feature.get("geometry", {}).get("coordinates", [])))
+        if not coordinate_pairs:
+            continue
+        longitudes = [pair[0] for pair in coordinate_pairs]
+        latitudes = [pair[1] for pair in coordinate_pairs]
+        meta["longitude"] = (min(longitudes) + max(longitudes)) / 2
+        meta["latitude"] = (min(latitudes) + max(latitudes)) / 2
+
+
+def build_assets(
+    all_csv: Path,
+    metrics_csv: Path,
+    boundaries_shp: Path,
+    output_dir: Path,
+    skip_boundaries: bool = False,
+) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     city_ids, city_meta = collect_city_metadata(metrics_csv)
-    series, city_to_idx, values_per_year, city_block_size = build_city_series(all_csv, metrics_csv, city_ids)
+    metric_series, age_series, city_to_idx, metric_city_block_size, age_city_block_size = build_city_series(
+        all_csv,
+        metrics_csv,
+        city_ids,
+    )
 
-    series_output = output_dir / "city_series.bin"
-    with series_output.open("wb") as handle:
-        series.tofile(handle)
+    metric_series_output = output_dir / "city_metric_series.bin"
+    with metric_series_output.open("wb") as handle:
+        metric_series.tofile(handle)
+
+    snapshot_series = build_snapshot_series(metric_series, city_ids, metric_city_block_size)
+    snapshot_series_output = output_dir / f"city_snapshot_{SNAPSHOT_YEAR}.bin"
+    with snapshot_series_output.open("wb") as handle:
+        snapshot_series.tofile(handle)
+
+    age_series_output = output_dir / "city_age_series.bin"
+    with age_series_output.open("wb") as handle:
+        age_series.tofile(handle)
+
+    boundaries_output = output_dir / "static_boundaries.geojson"
+    if not skip_boundaries:
+        write_boundaries_geojson(
+            boundaries_shp=boundaries_shp,
+            output_geojson=boundaries_output,
+            city_meta=city_meta,
+        )
+    backfill_city_coordinates(boundaries_output, city_meta)
 
     write_city_index(
         output_json=output_dir / "city_index.json",
         city_ids=city_ids,
         city_meta=city_meta,
         city_to_idx=city_to_idx,
-        city_block_size=city_block_size,
-        values_per_year=values_per_year,
-    )
-
-    write_boundaries_geojson(
-        boundaries_shp=boundaries_shp,
-        output_geojson=output_dir / "static_boundaries.geojson",
-        city_meta=city_meta,
+        metric_city_block_size=metric_city_block_size,
+        age_city_block_size=age_city_block_size,
     )
 
     print(f"Cities: {len(city_ids)}")
     print(f"Years per city: {len(YEARS)}")
-    print(f"Values per year: {values_per_year}")
-    print(f"Binary values: {len(series)}")
-    print(f"Wrote: {series_output}")
+    print(f"Metric values per year: {len(METRIC_COLUMNS)}")
+    print(f"Age values per year: {len(AGE_COLUMNS)}")
+    print(f"Metric binary values: {len(metric_series)}")
+    print(f"Snapshot binary values: {len(snapshot_series)}")
+    print(f"Age binary values: {len(age_series)}")
+    print(f"Wrote: {metric_series_output}")
+    print(f"Wrote: {snapshot_series_output}")
+    print(f"Wrote: {age_series_output}")
     print(f"Wrote: {output_dir / 'city_index.json'}")
-    print(f"Wrote: {output_dir / 'static_boundaries.geojson'}")
+    if not skip_boundaries:
+        print(f"Wrote: {output_dir / 'static_boundaries.geojson'}")
 
 
 def main() -> None:
@@ -453,20 +548,31 @@ def main() -> None:
         default=repo_root / "02_code/01_mapping/web/data",
         help="Output folder for web assets",
     )
+    parser.add_argument(
+        "--skip-boundaries",
+        action="store_true",
+        help="Reuse the existing GeoJSON and rebuild only the compact series and city index.",
+    )
     args = parser.parse_args()
 
     if not args.all_csv.exists():
         raise FileNotFoundError(f"Missing all-csv file: {args.all_csv}")
     if not args.metrics_csv.exists():
         raise FileNotFoundError(f"Missing metrics-csv file: {args.metrics_csv}")
-    if not args.boundaries_shp.exists():
+    if not args.skip_boundaries and not args.boundaries_shp.exists():
         raise FileNotFoundError(f"Missing boundaries shapefile: {args.boundaries_shp}")
+    if args.skip_boundaries and not (args.output_dir / "static_boundaries.geojson").exists():
+        raise FileNotFoundError(
+            f"Cannot skip boundaries because no existing GeoJSON was found: "
+            f"{args.output_dir / 'static_boundaries.geojson'}"
+        )
 
     build_assets(
         all_csv=args.all_csv,
         metrics_csv=args.metrics_csv,
         boundaries_shp=args.boundaries_shp,
         output_dir=args.output_dir,
+        skip_boundaries=args.skip_boundaries,
     )
 
 

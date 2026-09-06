@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zimmermaps.github.io/urban_demography/sitemap.xml

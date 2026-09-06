@@ -3,28 +3,253 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GUDD Explorer | Maps</title>
+  <title>Global Urban Demographic Dataset Explorer | GUDD</title>
+  <meta name="description" content="Explore annual population, age–sex structure, dependency, fertility, natural change, and migration for more than 10,000 cities worldwide, 2000–2020.">
+  <meta name="author" content="Andrew Zimmer, Nina Brooks, Andrea E. Gaughan, Jonathan Giezendanner, and Cascade Tuholske">
+  <meta name="keywords" content="urban demography, city population, age-sex structure, dependency ratio, fertility, natural change, migration, GUDD">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="application-name" content="GUDD Explorer">
+  <meta name="theme-color" content="#0e1d2d">
+  <link rel="canonical" href="https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/">
+  <link rel="author" href="https://www.linkedin.com/in/andrewzimmer1/">
+  <link rel="sitemap" type="application/xml" href="https://zimmermaps.github.io/urban_demography/sitemap.xml">
+  <link rel="alternate" type="text/plain" href="https://zimmermaps.github.io/urban_demography/llms.txt" title="LLM-readable project summary">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Global Urban Demographic Dataset">
+  <meta property="og:url" content="https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/">
+  <meta property="og:title" content="Global Urban Demographic Dataset Explorer">
+  <meta property="og:description" content="Explore city population, age–sex structure, dependency, fertility, natural change, and migration worldwide from 2000 to 2020.">
+  <meta property="og:image" content="https://media.springernature.com/w220/springer-static/cover-hires/journal/44284/3/7">
+  <meta property="og:image:alt" content="Nature Cities July 2026 cover, Urban populations in flux">
+  <meta property="og:image:width" content="220">
+  <meta property="og:image:height" content="292">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Global Urban Demographic Dataset Explorer">
+  <meta name="twitter:description" content="Interactive city-level demographic estimates and change metrics for more than 10,000 cities, 2000–2020.">
+  <meta name="twitter:image" content="https://media.springernature.com/w220/springer-static/cover-hires/journal/44284/3/7">
+  <meta name="twitter:image:alt" content="Nature Cities July 2026 cover, Urban populations in flux">
+
+  <meta name="DC.title" content="Global Urban Demographic Dataset Explorer">
+  <meta name="DC.description" content="Interactive exploration of annual global city population, age–sex structure, demographic rates, and population growth drivers from 2000 to 2020.">
+  <meta name="DC.creator" content="Andrew Zimmer; Nina Brooks; Andrea E. Gaughan; Jonathan Giezendanner; Cascade Tuholske">
+  <meta name="DC.identifier" content="https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/">
+  <meta name="DC.relation" content="https://doi.org/10.1038/s44284-026-00447-7">
+  <meta name="DC.relation" content="https://doi.org/10.1038/s44284-026-00469-1">
+  <meta name="DC.relation" content="https://doi.org/10.7910/DVN/GMV8WG">
+  <meta name="DC.rights" content="MIT License">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0001-7683-8713",
+        "name": "Andrew Zimmer",
+        "sameAs": "https://www.linkedin.com/in/andrewzimmer1/"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0003-3409-5434",
+        "name": "Nina Brooks"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0002-4898-1587",
+        "name": "Andrea E. Gaughan"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0001-8809-8513",
+        "name": "Jonathan Giezendanner"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0002-4806-0462",
+        "name": "Cascade Tuholske"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/#application",
+        "name": "Global Urban Demographic Dataset Explorer",
+        "alternateName": "GUDD Explorer",
+        "url": "https://zimmermaps.github.io/urban_demography/gudd-explorer/maps/",
+        "description": "An interactive map and city-level chart explorer for annual population, age–sex structure, dependency, fertility, natural change, and migration estimates for more than 10,000 cities worldwide from 2000 to 2020.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript and a modern web browser.",
+        "isAccessibleForFree": true,
+        "datePublished": "2026-02-19",
+        "dateModified": "2026-09-06",
+        "softwareVersion": "1.0.0",
+        "creator": [
+          { "@id": "https://orcid.org/0000-0001-7683-8713" },
+          { "@id": "https://orcid.org/0000-0003-3409-5434" },
+          { "@id": "https://orcid.org/0000-0002-4898-1587" },
+          { "@id": "https://orcid.org/0000-0001-8809-8513" },
+          { "@id": "https://orcid.org/0000-0002-4806-0462" }
+        ],
+        "about": [
+          "Urban demography",
+          "Population age and sex structure",
+          "Dependency ratios",
+          "Fertility",
+          "Natural population change",
+          "Migration"
+        ],
+        "keywords": "urban demography, city population, age-sex structure, dependency ratio, fertility, natural change, migration, GUDD",
+        "citation": [
+          { "@id": "https://doi.org/10.1038/s44284-026-00447-7#article" },
+          { "@id": "https://doi.org/10.1038/s44284-026-00469-1#briefing" }
+        ],
+        "mainEntity": { "@id": "https://doi.org/10.7910/DVN/GMV8WG#dataset" },
+        "codeRepository": "https://github.com/zimmermaps/urban_demography",
+        "license": "https://github.com/zimmermaps/urban_demography/blob/main/LICENSE"
+      },
+      {
+        "@type": "Dataset",
+        "@id": "https://doi.org/10.7910/DVN/GMV8WG#dataset",
+        "name": "Global Urban Demographic Dataset (GUDD), version 1",
+        "url": "https://doi.org/10.7910/DVN/GMV8WG",
+        "identifier": "https://doi.org/10.7910/DVN/GMV8WG",
+        "version": "1.0",
+        "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "description": "Annual city-level estimates of population age–sex structure, demographic rates, natural change, and net migration for more than 10,000 cities worldwide.",
+        "isAccessibleForFree": true,
+        "temporalCoverage": "2000/2020",
+        "spatialCoverage": { "@type": "Place", "name": "Worldwide" },
+        "creator": [
+          { "@id": "https://orcid.org/0000-0001-7683-8713" },
+          { "@id": "https://orcid.org/0000-0003-3409-5434" },
+          { "@id": "https://orcid.org/0000-0002-4898-1587" },
+          { "@id": "https://orcid.org/0000-0001-8809-8513" },
+          { "@id": "https://orcid.org/0000-0002-4806-0462" }
+        ],
+        "variableMeasured": [
+          "Total population",
+          "Total dependency ratio",
+          "Youth dependency ratio",
+          "Old-age dependency ratio",
+          "Sex ratio",
+          "Women of childbearing age",
+          "General fertility rate",
+          "Natural population change",
+          "Migration"
+        ],
+        "citation": { "@id": "https://doi.org/10.1038/s44284-026-00447-7#article" },
+        "distribution": [
+          {
+            "@type": "DataDownload",
+            "name": "Annual metrics with static 2020 city boundaries",
+            "encodingFormat": "text/csv",
+            "contentSize": "153 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13669704?format=original"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "2000–2020 change metrics with static 2020 city boundaries",
+            "encodingFormat": "text/csv",
+            "contentSize": "5.7 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13669707?format=original"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "Full age–sex dataset with static 2020 city boundaries",
+            "encodingFormat": "text/csv",
+            "contentSize": "171 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13669706"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "Annual metrics with dynamically evolving city boundaries",
+            "encodingFormat": "text/csv",
+            "contentSize": "140 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13670834?format=original"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "2000–2020 change metrics with dynamically evolving city boundaries",
+            "encodingFormat": "text/csv",
+            "contentSize": "4.3 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13670835?format=original"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "Full age–sex dataset with dynamically evolving city boundaries",
+            "encodingFormat": "text/csv",
+            "contentSize": "158 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13670832?format=original"
+          },
+          {
+            "@type": "DataDownload",
+            "name": "Dataset documentation",
+            "encodingFormat": "application/pdf",
+            "contentSize": "6.5 MB",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/13674920"
+          }
+        ]
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://doi.org/10.1038/s44284-026-00447-7#article",
+        "headline": "Global divergence in urban demographic change and migration patterns",
+        "url": "https://doi.org/10.1038/s44284-026-00447-7",
+        "datePublished": "2026-05-26",
+        "author": [
+          { "@id": "https://orcid.org/0000-0001-7683-8713" },
+          { "@id": "https://orcid.org/0000-0003-3409-5434" },
+          { "@id": "https://orcid.org/0000-0002-4898-1587" },
+          { "@id": "https://orcid.org/0000-0002-4806-0462" }
+        ],
+        "isPartOf": { "@type": "Periodical", "name": "Nature Cities" },
+        "volumeNumber": "3",
+        "pageStart": "599",
+        "pageEnd": "607"
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://doi.org/10.1038/s44284-026-00469-1#briefing",
+        "headline": "A clearer picture of who lives in the world’s cities",
+        "url": "https://doi.org/10.1038/s44284-026-00469-1",
+        "datePublished": "2026-06-08",
+        "isPartOf": { "@type": "Periodical", "name": "Nature Cities" },
+        "volumeNumber": "3",
+        "pageStart": "580",
+        "pageEnd": "581"
+      }
+    ]
+  }
+  </script>
   <link
     rel="icon"
     type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E"
+    href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22%3E%3Ctext%20y=%22.9em%22%20font-size=%2290%22%3E%F0%9F%8C%8D%3C/text%3E%3C/svg%3E"
   >
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+  <link rel="preconnect" href="https://media.springernature.com">
   <link href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.4.0/dist/maplibre-gl.css" rel="stylesheet">
-  <link rel="preload" href="./data/city_index.json" as="fetch" crossorigin="anonymous">
-  <link rel="preload" href="./data/static_boundaries.geojson" as="fetch" crossorigin="anonymous">
-  <link rel="preload" href="./data/city_series.bin" as="fetch" crossorigin="anonymous">
+  <link rel="preload" href="./data/city_index.json" as="fetch" crossorigin="anonymous" fetchpriority="high">
+  <link rel="preload" href="./data/city_snapshot_2020.bin" as="fetch" crossorigin="anonymous" fetchpriority="high">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body class="theme-dark">
+  <noscript>
+    <section class="noscript-message" aria-label="GUDD Explorer information">
+      <h2>Global Urban Demographic Dataset Explorer</h2>
+      <p>This interactive explorer requires JavaScript. The underlying GUDD dataset covers annual city population, age–sex structure, dependency, fertility, natural change, and migration worldwide from 2000 to 2020.</p>
+      <p><a href="https://doi.org/10.1038/s44284-026-00447-7">Read the paper</a> · <a href="https://doi.org/10.1038/s44284-026-00469-1">Read the Research Briefing</a> · <a href="https://doi.org/10.7910/DVN/GMV8WG">Access the dataset</a></p>
+    </section>
+  </noscript>
   <main id="app">
     <section id="sidebar" class="sidebar">
       <div id="sidebarResizeHandle" class="sidebar-resize-handle" aria-hidden="true"></div>
-      <button id="closeSidebar" class="close-button" type="button" aria-label="Close panel">Close</button>
+      <button id="closeSidebar" class="close-button" type="button" aria-label="Close city details panel">Close panel</button>
       <header class="sidebar-header">
-        <h1 id="cityTitle">Select a City</h1>
+        <p class="sidebar-kicker">City profile</p>
+        <h2 id="cityTitle">Select a city</h2>
         <div id="cityMetaRows" class="city-meta">
           <p><span>Country:</span> —</p>
           <p><span>Region:</span> —</p>
@@ -32,18 +257,37 @@
         </div>
       </header>
 
-      <section class="controls">
+      <div class="controls">
         <label for="yearSlider" class="control-label">Year</label>
         <div class="control-row">
           <input id="yearSlider" type="range" min="0" max="20" step="1" value="20" disabled>
           <span id="yearValue" class="year-value">2020</span>
-          <button id="playPauseButton" type="button" class="play-button" disabled>Play</button>
+          <div class="animation-controls" role="group" aria-label="Animation playback and speed">
+            <button
+              id="slowerAnimationButton"
+              type="button"
+              class="play-button speed-button"
+              title="Slow down animation"
+              aria-label="Slow down animation"
+              disabled
+            >−</button>
+            <button id="playPauseButton" type="button" class="play-button" disabled>Play</button>
+            <button
+              id="fasterAnimationButton"
+              type="button"
+              class="play-button speed-button"
+              title="Speed up animation"
+              aria-label="Speed up animation"
+              disabled
+            >+</button>
+            <output id="animationSpeedValue" class="animation-speed-value" aria-live="polite">1×</output>
+          </div>
         </div>
-      </section>
+      </div>
 
-      <section>
+      <section class="sidebar-section">
         <div class="section-title-row">
-          <h2 class="section-title">Country Population and Dependency</h2>
+          <h2 class="section-title">Country population and dependency</h2>
           <div class="section-actions">
             <button
               id="downloadCountryGifButton"
@@ -52,7 +296,7 @@
               title="Download country population and dependency GIF"
               aria-label="Download country population and dependency GIF"
               disabled
-            >GIF↓</button>
+            >GIF ↓</button>
             <button
               id="downloadCountryPngButton"
               type="button"
@@ -60,17 +304,28 @@
               title="Download country population and dependency PNG"
               aria-label="Download country population and dependency PNG"
               disabled
-            >PNG↓</button>
+            >PNG ↓</button>
           </div>
         </div>
+        <label class="country-highlight-toggle" for="highlightSelectedCity">
+          <input id="highlightSelectedCity" type="checkbox" checked disabled>
+          <span>Highlight selected city</span>
+        </label>
         <div id="countryPlotFrame" class="plot canvas-plot-frame">
-          <canvas id="countryPlotCanvas" class="country-plot-canvas" width="980" height="680"></canvas>
+          <canvas
+            id="countryPlotCanvas"
+            class="country-plot-canvas"
+            width="980"
+            height="620"
+            role="img"
+            aria-label="Country comparison scatter plot. Select a city to view data."
+          ></canvas>
         </div>
       </section>
 
-      <section>
+      <section class="sidebar-section">
         <div class="section-title-row">
-          <h2 class="section-title">Population Pyramid</h2>
+          <h2 class="section-title">Population pyramid</h2>
           <button
             id="downloadGifButton"
             type="button"
@@ -78,14 +333,14 @@
             title="Download population pyramid GIF"
             aria-label="Download population pyramid GIF"
             disabled
-          >GIF↓</button>
+          >GIF ↓</button>
         </div>
-        <div id="pyramidPlot" class="plot"></div>
+        <div id="pyramidPlot" class="plot" role="img" aria-label="Population pyramid. Select a city to view data."></div>
       </section>
 
-      <section>
+      <section class="sidebar-section">
         <div class="section-title-row">
-          <h2 class="section-title">Population and Dependency</h2>
+          <h2 class="section-title">Population and dependency</h2>
           <button
             id="downloadTrendPngButton"
             type="button"
@@ -93,19 +348,24 @@
             title="Download population and dependency PNG"
             aria-label="Download population and dependency PNG"
             disabled
-          >PNG↓</button>
+          >PNG ↓</button>
         </div>
-        <div id="trendPlot" class="plot"></div>
+        <div id="trendPlot" class="plot" role="img" aria-label="Population and dependency trend. Select a city to view data."></div>
       </section>
 
-      <section>
-        <h2 class="section-title">Snapshot Metrics</h2>
+      <section class="sidebar-section">
+        <h2 class="section-title">Snapshot metrics</h2>
         <div id="metricCards" class="metric-cards"></div>
       </section>
 
-      <section class="data-source">
-        Data from Zimmer et al., <em>Global Divergence in Urban Demographic Change and Migration Patterns</em>.
-        <a href="https://github.com/zimmermaps/urban_demography" target="_blank" rel="noreferrer noopener">Repository</a>
+      <section class="more-information">
+        <h2>More Information</h2>
+        <nav class="information-links" aria-label="More information about the research">
+          <a class="information-link" href="https://doi.org/10.1038/s44284-026-00447-7" target="_blank" rel="noreferrer noopener">Full paper ↗</a>
+          <a class="information-link" href="https://doi.org/10.1038/s44284-026-00469-1" target="_blank" rel="noreferrer noopener">Research briefing ↗</a>
+          <a class="information-link" href="https://doi.org/10.7910/DVN/GMV8WG" target="_blank" rel="noreferrer noopener">Dataset ↗</a>
+          <a class="information-link" href="https://github.com/zimmermaps/urban_demography" target="_blank" rel="noreferrer noopener">Code ↗</a>
+        </nav>
       </section>
     </section>
 
@@ -113,44 +373,346 @@
       <div id="loadingOverlay" class="loading-overlay" aria-live="polite">
         <div class="loading-card">
           <div class="loading-spinner" aria-hidden="true"></div>
-          <p class="loading-kicker">Preparing Map</p>
-          <p id="loadingMessage" class="loading-message">Loading basemap...</p>
+          <p class="loading-kicker">Preparing the explorer</p>
+          <p id="loadingMessage" class="loading-message">Loading the basemap…</p>
           <div class="loading-steps" aria-hidden="true">
-            <div id="loadingStepMap" class="loading-step is-active">1. Loading map assets</div>
-            <div id="loadingStepVisuals" class="loading-step">2. Preloading visualizations</div>
+            <div id="loadingStepMap" class="loading-step is-active"><span>1</span> Loading map and city data</div>
+            <div id="loadingStepVisuals" class="loading-step"><span>2</span> Preparing charts and controls</div>
           </div>
         </div>
       </div>
       <div class="top-ribbon">
         <div class="title-block">
-          <h2>Global Urban Demographic Dataset (GUDD) Explorer</h2>
-          <p class="title-subtext">Explore and click a city for country-level context and city demographic breakdowns.</p>
-          <p class="title-meta">
-            <a
-              class="repo-link"
-              href="https://github.com/zimmermaps/urban_demography"
-              target="_blank"
-              rel="noreferrer noopener"
+          <div class="title-copy">
+            <h1>Global Urban Demographic Dataset (GUDD) Explorer</h1>
+            <p class="title-subtext">Explore demographic snapshots, change, and the drivers of population growth—then select any city for detailed charts.</p>
+            <p class="title-citation">
+              <span class="title-citation-full"><a href="https://www.linkedin.com/in/andrewzimmer1/" target="_blank" rel="author noreferrer noopener">Andrew Zimmer</a>, Nina Brooks, Andrea E. Gaughan &amp; Cascade Tuholske</span>
+              <span class="title-citation-compact"><a href="https://www.linkedin.com/in/andrewzimmer1/" target="_blank" rel="author noreferrer noopener">Zimmer</a> · Brooks · Gaughan · Tuholske</span>
+              <span> (2026) · <em>Nature Cities</em></span>
+            </p>
+            <nav class="title-resources" aria-label="Paper, briefing, data, citations, and source code">
+              <a
+                class="title-resource"
+                href="https://doi.org/10.1038/s44284-026-00447-7"
+                target="_blank"
+                rel="noreferrer noopener"
+                title="Read the open-access paper"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 3h8l4 4v14H6z"></path>
+                  <path d="M14 3v5h4M9 12h6M9 16h6"></path>
+                </svg>
+                <span>Paper</span>
+              </a>
+              <a
+                class="title-resource"
+                href="https://rdcu.be/fnwNx"
+                target="_blank"
+                rel="noreferrer noopener"
+                title="Read the free Research Briefing"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M4 5h16v14H4z"></path>
+                  <path d="M8 9h8M8 13h8M8 17h5"></path>
+                </svg>
+                <span>Briefing</span>
+              </a>
+              <button
+                id="openHeaderDownloadButton"
+                class="title-resource"
+                type="button"
+                title="Open dataset downloads"
+                aria-haspopup="dialog"
+                aria-controls="aboutDialog"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 3v12M7.5 10.5 12 15l4.5-4.5M5 20h14"></path>
+                </svg>
+                <span>Data</span>
+              </button>
+              <button
+                id="openHeaderCitationsButton"
+                class="title-resource"
+                type="button"
+                title="View and copy citations"
+                aria-haspopup="dialog"
+                aria-controls="aboutDialog"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h4"></path>
+                </svg>
+                <span>Citations</span>
+              </button>
+              <a
+                class="title-resource title-resource-github"
+                href="https://github.com/zimmermaps/urban_demography"
+                target="_blank"
+                rel="noreferrer noopener"
+                title="Open the GitHub repository"
+              >
+                <svg class="icon-fill" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52 0-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+                </svg>
+                <span>GitHub</span>
+              </a>
+            </nav>
+          </div>
+          <a
+            class="cover-link"
+            href="https://www.nature.com/natcities/volumes/3/issues/7"
+            target="_blank"
+            rel="noreferrer noopener"
+            aria-label="View the Nature Cities July 2026 cover issue"
+            title="Featured on the Nature Cities cover · July 2026"
+          >
+            <img
+              src="https://media.springernature.com/w220/springer-static/cover-hires/journal/44284/3/7"
+              width="220"
+              height="292"
+              alt="Nature Cities July 2026 cover: Urban populations in flux"
+              decoding="async"
+              fetchpriority="low"
             >
-              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52 0-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.11 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.91.08 2.11.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
-              </svg>
-              <span>GitHub Repository</span>
-            </a>
-            <span>Zimmer et al. (2026). <a href="https://www.nature.com/articles/s44284-026-00447-7" target="_blank" rel="noreferrer noopener"><em>Nature Cities</em></a>.</span>
-          </p>
+          </a>
         </div>
         <div class="top-right-controls">
-          <button id="basemapToggle" class="map-toggle" type="button" title="Switch dark/light basemap">🌓</button>
-          <p id="statusText" class="status">Loading map layers...</p>
+          <button id="basemapToggle" class="map-toggle" type="button" title="Switch to light basemap" aria-label="Switch to light basemap">
+            <span class="theme-icon" aria-hidden="true"></span>
+            <span id="basemapToggleLabel">Light map</span>
+          </button>
+          <p id="statusText" class="status" aria-live="polite">Loading map layers…</p>
         </div>
       </div>
+      <aside id="metricExplorer" class="metric-explorer" aria-label="Map metric explorer">
+        <div class="metric-explorer-header">
+          <div>
+            <p class="explorer-kicker">Map layer</p>
+            <h2>Explore city metrics</h2>
+          </div>
+          <button
+            id="metricExplorerToggle"
+            class="explorer-collapse-button"
+            type="button"
+            aria-expanded="true"
+            aria-controls="metricExplorerBody"
+          >Collapse</button>
+        </div>
+        <div id="metricExplorerBody" class="metric-explorer-body">
+          <div class="mode-tabs" role="group" aria-label="Metric view">
+            <button class="mode-tab is-active" type="button" data-map-mode="snapshot" aria-pressed="true">Snapshot</button>
+            <button class="mode-tab" type="button" data-map-mode="change" aria-pressed="false" disabled>Change</button>
+            <button class="mode-tab" type="button" data-map-mode="drivers" aria-pressed="false" disabled>Growth drivers</button>
+          </div>
+          <p id="historicalDataStatus" class="historical-data-status" role="status" aria-live="polite">Historical layers are loading in the background…</p>
+
+          <label id="mapMetricField" class="explorer-field" for="mapMetricSelect">
+            <span>Metric</span>
+            <select id="mapMetricSelect">
+              <option value="total_pop">Total population</option>
+              <option value="total_dr">Total dependency ratio</option>
+              <option value="young_dr">Youth dependency ratio</option>
+              <option value="old_dr">Old-age dependency ratio</option>
+              <option value="total_sr">Sex ratio</option>
+              <option value="women_cba">Women of childbearing age</option>
+              <option value="general_fr">General fertility rate</option>
+            </select>
+          </label>
+
+          <div id="snapshotControls" class="explorer-grid explorer-grid-single">
+            <label class="explorer-field" for="snapshotYearSelect">
+              <span>Year</span>
+              <select id="snapshotYearSelect" disabled></select>
+            </label>
+          </div>
+
+          <div id="changeControls" class="explorer-grid" hidden>
+            <label class="explorer-field" for="changeStartYearSelect">
+              <span>From</span>
+              <select id="changeStartYearSelect" disabled></select>
+            </label>
+            <label class="explorer-field" for="changeEndYearSelect">
+              <span>To</span>
+              <select id="changeEndYearSelect" disabled></select>
+            </label>
+            <label id="changeUnitField" class="explorer-field explorer-grid-wide" for="changeUnitSelect">
+              <span>Express change as</span>
+              <select id="changeUnitSelect">
+                <option value="percent">Percent change</option>
+                <option value="absolute">Absolute change</option>
+              </select>
+            </label>
+          </div>
+
+          <p id="driverExplanation" class="driver-explanation" hidden>
+            Color shows migration’s share of positive population growth; point size shows total growth. To match the paper, cities with negative natural change or migration are omitted.
+          </p>
+
+          <label class="point-visibility-toggle" for="showMetricPoints">
+            <input id="showMetricPoints" type="checkbox" checked>
+            <span>Show cities on map</span>
+          </label>
+
+          <div class="map-legend" aria-live="polite">
+            <p id="mapLegendTitle" class="map-legend-title">Total population · 2020</p>
+            <div id="mapLegendBar" class="map-legend-bar"></div>
+            <div class="map-legend-values">
+              <span id="mapLegendMin">—</span>
+              <span id="mapLegendMid">—</span>
+              <span id="mapLegendMax">—</span>
+            </div>
+            <p id="mapLegendNote" class="map-legend-note">Loading city values…</p>
+          </div>
+
+          <div class="explorer-actions">
+            <button id="openDownloadButton" type="button" aria-haspopup="dialog" aria-controls="aboutDialog">Download files</button>
+            <button id="openAboutButton" type="button" aria-haspopup="dialog" aria-controls="aboutDialog">Citations</button>
+          </div>
+        </div>
+      </aside>
       <div id="map"></div>
     </section>
+
+    <dialog id="aboutDialog" class="info-dialog" aria-labelledby="aboutDialogTitle">
+      <div class="dialog-heading">
+        <div>
+          <p class="dialog-kicker">About this explorer</p>
+          <h2 id="aboutDialogTitle">Research, data &amp; citations</h2>
+        </div>
+        <form method="dialog"><button type="submit" class="dialog-close">Close</button></form>
+      </div>
+      <p>
+        The Global Urban Demographic Dataset provides annual city-level estimates of population size, age–sex structure, natural change, and net migration for more than 10,000 cities worldwide from 2000 to 2020.
+      </p>
+      <div class="resource-links">
+        <a href="https://doi.org/10.1038/s44284-026-00447-7" target="_blank" rel="noreferrer noopener">Read the open-access paper ↗</a>
+        <a href="https://rdcu.be/fnwNx" target="_blank" rel="noreferrer noopener">Read the free Research Briefing ↗</a>
+        <a href="https://doi.org/10.7910/DVN/GMV8WG" target="_blank" rel="noreferrer noopener">View the Harvard Dataverse record ↗</a>
+        <a href="https://github.com/zimmermaps/urban_demography" target="_blank" rel="noreferrer noopener">View the source code ↗</a>
+      </div>
+      <section id="citationsSection" class="dialog-section" tabindex="-1">
+        <div class="dialog-section-heading">
+          <div>
+            <p class="dialog-kicker">Reuse this work</p>
+            <h3>Citations</h3>
+          </div>
+          <p>Copy a formatted reference or BibTeX.</p>
+        </div>
+        <div class="citation-list">
+          <article class="citation-card">
+            <div class="citation-card-heading">
+              <div><span class="citation-kind">Paper</span><h4>Nature Cities article</h4></div>
+              <a href="https://doi.org/10.1038/s44284-026-00447-7" target="_blank" rel="noreferrer noopener">DOI ↗</a>
+            </div>
+            <p id="paperCitation" class="citation-text">Zimmer, A., Brooks, N., Gaughan, A. E., &amp; Tuholske, C. (2026). Global divergence in urban demographic change and migration patterns. <em>Nature Cities</em>, <em>3</em>, 599–607. https://doi.org/10.1038/s44284-026-00447-7</p>
+            <div class="citation-actions">
+              <button type="button" data-copy-target="paperCitation" data-copy-name="Paper citation">Copy citation</button>
+              <button type="button" data-copy-target="paperBibtex" data-copy-name="Paper BibTeX">Copy BibTeX</button>
+            </div>
+            <pre id="paperBibtex" hidden>@article{zimmer2026global,
+  author = {Zimmer, Andrew and Brooks, Nina and Gaughan, Andrea E. and Tuholske, Cascade},
+  title = {Global divergence in urban demographic change and migration patterns},
+  journal = {Nature Cities},
+  year = {2026},
+  volume = {3},
+  pages = {599--607},
+  doi = {10.1038/s44284-026-00447-7},
+  url = {https://doi.org/10.1038/s44284-026-00447-7}
+}</pre>
+          </article>
+          <article class="citation-card">
+            <div class="citation-card-heading">
+              <div><span class="citation-kind">Research Briefing</span><h4>Plain-language summary</h4></div>
+              <a href="https://doi.org/10.1038/s44284-026-00469-1" target="_blank" rel="noreferrer noopener">DOI ↗</a>
+            </div>
+            <p id="briefingCitation" class="citation-text">A clearer picture of who lives in the world’s cities. (2026). <em>Nature Cities</em>, <em>3</em>, 580–581. https://doi.org/10.1038/s44284-026-00469-1</p>
+            <div class="citation-actions">
+              <button type="button" data-copy-target="briefingCitation" data-copy-name="Research Briefing citation">Copy citation</button>
+              <button type="button" data-copy-target="briefingBibtex" data-copy-name="Research Briefing BibTeX">Copy BibTeX</button>
+            </div>
+            <pre id="briefingBibtex" hidden>@article{naturecities2026clearer,
+  title = {A clearer picture of who lives in the world’s cities},
+  journal = {Nature Cities},
+  year = {2026},
+  volume = {3},
+  pages = {580--581},
+  doi = {10.1038/s44284-026-00469-1},
+  url = {https://doi.org/10.1038/s44284-026-00469-1}
+}</pre>
+          </article>
+          <article class="citation-card">
+            <div class="citation-card-heading">
+              <div><span class="citation-kind">Dataset</span><h4>GUDD version 1</h4></div>
+              <a href="https://doi.org/10.7910/DVN/GMV8WG" target="_blank" rel="noreferrer noopener">DOI ↗</a>
+            </div>
+            <p id="datasetCitation" class="citation-text">Zimmer, A., Brooks, N., Gaughan, A. E., Giezendanner, J., &amp; Tuholske, C. (2026). Global Urban Demographic Dataset (GUDD), version 1 [Data set]. Harvard Dataverse. https://doi.org/10.7910/DVN/GMV8WG</p>
+            <div class="citation-actions">
+              <button type="button" data-copy-target="datasetCitation" data-copy-name="Dataset citation">Copy citation</button>
+              <button type="button" data-copy-target="datasetBibtex" data-copy-name="Dataset BibTeX">Copy BibTeX</button>
+            </div>
+            <pre id="datasetBibtex" hidden>@misc{zimmer2026gudd,
+  author = {Zimmer, Andrew and Brooks, Nina and Gaughan, Andrea E. and Giezendanner, Jonathan and Tuholske, Cascade},
+  title = {Global Urban Demographic Dataset (GUDD), version 1},
+  year = {2026},
+  publisher = {Harvard Dataverse},
+  version = {1},
+  doi = {10.7910/DVN/GMV8WG},
+  url = {https://doi.org/10.7910/DVN/GMV8WG},
+  note = {Data set}
+}</pre>
+          </article>
+          <article class="citation-card">
+            <div class="citation-card-heading">
+              <div><span class="citation-kind">Code</span><h4>Explorer and analysis</h4></div>
+              <a href="https://github.com/zimmermaps/urban_demography" target="_blank" rel="noreferrer noopener">GitHub ↗</a>
+            </div>
+            <p id="codeCitation" class="citation-text">Zimmer, A., Brooks, N., Gaughan, A. E., Giezendanner, J., &amp; Tuholske, C. (2026). Global divergence in urban demographic change and migration patterns (Version 1.0.0) [Computer software]. GitHub. https://github.com/zimmermaps/urban_demography</p>
+            <div class="citation-actions">
+              <button type="button" data-copy-target="codeCitation" data-copy-name="Code citation">Copy citation</button>
+              <button type="button" data-copy-target="codeBibtex" data-copy-name="Code BibTeX">Copy BibTeX</button>
+            </div>
+            <pre id="codeBibtex" hidden>@misc{zimmer2026urbanDemography,
+  author = {Zimmer, Andrew and Brooks, Nina and Gaughan, Andrea E. and Giezendanner, Jonathan and Tuholske, Cascade},
+  title = {Global divergence in urban demographic change and migration patterns},
+  year = {2026},
+  version = {1.0.0},
+  howpublished = {GitHub},
+  url = {https://github.com/zimmermaps/urban_demography},
+  note = {Computer software}
+}</pre>
+          </article>
+        </div>
+        <p id="citationCopyStatus" class="sr-only" role="status" aria-live="polite"></p>
+      </section>
+      <section id="downloadsSection" class="dialog-section" tabindex="-1">
+        <div class="dialog-section-heading">
+          <div>
+            <p class="dialog-kicker">Published data</p>
+            <h3>Direct downloads</h3>
+          </div>
+          <a class="section-link" href="https://doi.org/10.7910/DVN/GMV8WG" target="_blank" rel="noreferrer noopener">Dataset record ↗</a>
+        </div>
+        <h4 class="download-group-title">Static 2020 city boundaries</h4>
+        <div class="dataverse-downloads">
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13669704?format=original" target="_blank" rel="noreferrer noopener">Annual metrics · static boundaries · CSV (153 MB)</a>
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13669707?format=original" target="_blank" rel="noreferrer noopener">2000–2020 change metrics · static boundaries · CSV (5.7 MB)</a>
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13669706" target="_blank" rel="noreferrer noopener">Full age–sex dataset · static boundaries · CSV (171 MB)</a>
+        </div>
+        <h4 class="download-group-title">Dynamically evolving city boundaries</h4>
+        <div class="dataverse-downloads">
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13670834?format=original" target="_blank" rel="noreferrer noopener">Annual metrics · dynamic boundaries · CSV (140 MB)</a>
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13670835?format=original" target="_blank" rel="noreferrer noopener">2000–2020 change metrics · dynamic boundaries · CSV (4.3 MB)</a>
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13670832?format=original" target="_blank" rel="noreferrer noopener">Full age–sex dataset · dynamic boundaries · CSV (158 MB)</a>
+        </div>
+        <h4 class="download-group-title">Documentation</h4>
+        <div class="dataverse-downloads">
+          <a href="https://dataverse.harvard.edu/api/access/datafile/13674920" target="_blank" rel="noreferrer noopener">Dataset documentation · PDF (6.5 MB)</a>
+        </div>
+      </section>
+    </dialog>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.4.0/dist/maplibre-gl.js"></script>
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.4.0/dist/maplibre-gl.js" fetchpriority="high"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

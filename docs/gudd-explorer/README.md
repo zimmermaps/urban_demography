@@ -18,12 +18,16 @@ This folder is the consolidated static site root for the published GUDD explorer
 Only web-ready static assets are required for runtime:
 
 - `maps/data/city_index.json`
-- `maps/data/city_series.bin`
+- `maps/data/city_snapshot_2020.bin`
+- `maps/data/city_metric_series.bin`
+- `maps/data/city_age_series.bin`
 - `maps/data/static_boundaries.geojson`
 - app HTML/CSS/JS files
 
 You do **not** need to host the raw extracted CSV files for the site to run,
 as long as `maps/data/*` is already built.
+
+For a quick first paint, the map loads only the city index and 2020 snapshot. Historical metrics are deferred until after the initial render, age–sex values are fetched by byte range for the selected city, Plotly is loaded only when charts are opened, and detailed boundaries are requested only after users zoom in.
 
 ## Build + publish flow
 
